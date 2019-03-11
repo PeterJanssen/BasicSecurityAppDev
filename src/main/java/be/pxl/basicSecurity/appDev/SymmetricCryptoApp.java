@@ -2,11 +2,9 @@ package be.pxl.basicSecurity.appDev;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
@@ -20,19 +18,30 @@ import java.util.Scanner;
  * and 3DES symmetric encryption algorithms
  */
 
+// TODO write doc for this class
 public class SymmetricCryptoApp {
     public static void main(String[] args) {
         try (Scanner in = new Scanner(System.in)) {
-            System.out.print("Give me a path to a file: ");
-            String filePath = in.nextLine();
-            System.out.print("Give me a name for the output file: ");
-            String outputFileName = in.next();
+            String filePath = "";
+            String outputFileEncName = "";
+            String outputFileDecName = "";
+            while (filePath.equals("") || outputFileEncName.equals("")) {
+                System.out.print("Give me a path to a file: ");
+                filePath = in.nextLine();
+                System.out.print("Give me a name for the encrypted file: ");
+                outputFileEncName = in.nextLine();
+                System.out.println("Give me a name for the decrypted file: ");
+                outputFileDecName = in.nextLine();
+
+            }
 
             Path inputFile = Paths.get(filePath);
-            Path outputFile = inputFile.getParent().resolve(outputFileName);
-            SecretKey key = generateRandomAESKey(AESKeySize.SIZE_256);
+            Path outputFileEnc = inputFile.getParent().resolve(outputFileEncName);
+            Path outputFileDec = inputFile.getParent().resolve(outputFileDecName);
+            SecretKey key = generateRandomAESKey(AESKeySize.SIZE_128);
             IvParameterSpec iv = generateInitVector();
-            encryptAES(key, iv, inputFile, outputFile);
+            encryptAES(key, iv, inputFile, outputFileEnc);
+            decryptAES(key, iv, outputFileEnc, outputFileDec);
 
             System.out.println();
             System.out.println("Encrypted text AES: " /*+ encryptAES()*/); //TODO uncoomment method call when implemented
@@ -50,13 +59,35 @@ public class SymmetricCryptoApp {
      *
      * @param key        The AES key being used
      * @param initVector The initialization vector being used
-     * @param path       Specifies the path to the file to decrypt
-     * @throws
+     * @param inputFile  Specifies the path to the file to decrypt
+     * @param outputFile Specifies the path to the decrypted file
+     * @throws NoSuchAlgorithmException           When a particular cryptographic algorithm is requested
+     *                                            but is not available in the environment
+     * @throws NoSuchPaddingException             When the specified padding pattern isn't available in the
+     *                                            environment
+     * @throws InvalidAlgorithmParameterException
+     * @throws InvalidKeyException
+     * @throws IOException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
      */
 
-    // TODO Implement method
-    private static String decryptAES(String key, String initVector, String path) {
-        throw new NotImplementedException();
+    //TODO Refactor duplicate code in encryptAES() and decryptAES()
+    private static void decryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
+            NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
+        if (!key.getAlgorithm().equals("AES")) {
+            throw new NoSuchAlgorithmException();
+        }
+        Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        c.init(Cipher.DECRYPT_MODE, key, initVector);
+
+        try (FileInputStream fileInputStream = new FileInputStream(inputFile.toString());
+             FileOutputStream fileOutputStream = new FileOutputStream(outputFile.toString())) {
+            byte[] inputBytes = new byte[(int) inputFile.toFile().length()];
+            fileInputStream.read(inputBytes);
+            byte[] outputBytes = c.doFinal(inputBytes);
+            fileOutputStream.write(outputBytes);
+        }
     }
 
     /**
@@ -72,17 +103,26 @@ public class SymmetricCryptoApp {
      *                                            environment
      * @throws InvalidAlgorithmParameterException
      * @throws InvalidKeyException
+     * @throws IOException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
      */
 
-    // TODO Implement method
-    private static String encryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
-            NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+    private static void encryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
+            NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
         if (!key.getAlgorithm().equals("AES")) {
             throw new NoSuchAlgorithmException();
         }
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
         c.init(Cipher.ENCRYPT_MODE, key, initVector);
-        throw new NotImplementedException();
+
+        try (FileInputStream fileInputStream = new FileInputStream(inputFile.toString());
+             FileOutputStream fileOutputStream = new FileOutputStream(outputFile.toString())) {
+            byte[] inputBytes = new byte[(int) inputFile.toFile().length()];
+            fileInputStream.read(inputBytes);
+            byte[] outputBytes = c.doFinal(inputBytes);
+            fileOutputStream.write(outputBytes);
+        }
     }
 
     /**
