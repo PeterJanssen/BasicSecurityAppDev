@@ -25,29 +25,29 @@ public class SymmetricCryptoApp {
             String filePath = "";
             String outputFileEncName = "";
             String outputFileDecName = "";
+            String ivByteFileName = "";
             while (filePath.equals("") || outputFileEncName.equals("")) {
                 System.out.print("Give me a path to a file: ");
                 filePath = in.nextLine();
                 System.out.print("Give me a name for the encrypted file: ");
                 outputFileEncName = in.nextLine();
-                System.out.println("Give me a name for the decrypted file: ");
+                System.out.print("Give me a name for the decrypted file: ");
                 outputFileDecName = in.nextLine();
+                System.out.print("Give me a name for the IV bytefile: ");
+                ivByteFileName = in.nextLine();
 
             }
 
             Path inputFile = Paths.get(filePath);
             Path outputFileEnc = inputFile.getParent().resolve(outputFileEncName);
             Path outputFileDec = inputFile.getParent().resolve(outputFileDecName);
+            Path ivByteFile = inputFile.getParent().resolve(ivByteFileName);
             SecretKey key = generateRandomAESKey(AESKeySize.SIZE_128);
-            IvParameterSpec iv = generateInitVector();
+            IvParameterSpec iv = generateInitVector(ivByteFile);
             encryptAES(key, iv, inputFile, outputFileEnc);
-            decryptAES(key, iv, outputFileEnc, outputFileDec);
+            decryptAES(key, getInitVectorAES(ivByteFile), outputFileEnc, outputFileDec);
 
             System.out.println();
-            System.out.println("Encrypted text AES: " /*+ encryptAES()*/); //TODO uncoomment method call when implemented
-            System.out.println("Decrpyted text AES:" /*+ decryptAES()*/); //TODO uncoomment method call when implemented
-            System.out.println("Encrypted text 3DES: " /*+ encrypt3DES()*/); //TODO uncoomment method call when implemented
-            System.out.println("Decrpyted text 3DES: " /*+ decrypt3DES()*/); //TODO uncoomment method call when implemented
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,13 +81,7 @@ public class SymmetricCryptoApp {
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
         c.init(Cipher.DECRYPT_MODE, key, initVector);
 
-        try (FileInputStream fileInputStream = new FileInputStream(inputFile.toString());
-             FileOutputStream fileOutputStream = new FileOutputStream(outputFile.toString())) {
-            byte[] inputBytes = new byte[(int) inputFile.toFile().length()];
-            fileInputStream.read(inputBytes);
-            byte[] outputBytes = c.doFinal(inputBytes);
-            fileOutputStream.write(outputBytes);
-        }
+        runAlgorithm(inputFile, outputFile, c);
     }
 
     /**
@@ -116,6 +110,19 @@ public class SymmetricCryptoApp {
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
         c.init(Cipher.ENCRYPT_MODE, key, initVector);
 
+        runAlgorithm(inputFile, outputFile, c);
+    }
+
+    /**
+     * Runs the specified symmetric algorithm, using the specified files for input and output,
+     * and the specified cipher for the algorithm to be used
+     *
+     * @param inputFile  The path to the file, containing the input of the algorithm
+     * @param outputFile The path to the file, containing the output of the algorithm
+     * @param c          The cipher, specifying the used algorithm
+     */
+
+    private static void runAlgorithm(Path inputFile, Path outputFile, Cipher c) throws IOException, IllegalBlockSizeException, BadPaddingException {
         try (FileInputStream fileInputStream = new FileInputStream(inputFile.toString());
              FileOutputStream fileOutputStream = new FileOutputStream(outputFile.toString())) {
             byte[] inputBytes = new byte[(int) inputFile.toFile().length()];
@@ -142,13 +149,34 @@ public class SymmetricCryptoApp {
     /**
      * Generates a random initialization vector for the initial AES CBC cipher block
      * for block size = 16 bytes
+     *
+     * @param path Path to the folder where the bytestream will be stored
      */
 
-    private static IvParameterSpec generateInitVector() {
+    private static IvParameterSpec generateInitVector(Path path) throws IOException {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[16];
-        random.nextBytes(bytes);
+        try (DataOutputStream stream = new DataOutputStream(new FileOutputStream(path.toFile()))) {
+            random.nextBytes(bytes);
+            stream.write(bytes);
+        }
         return new IvParameterSpec(bytes);
+    }
+
+    /**
+     * Gets an AES CBC initialization vector, based on
+     *
+     * @param byteFile The path to the file, containing the bytes to create the initialization vector
+     * @return an instance of IvParameterSpec, based on a file containing 16 bytes of data
+     * @throws IOException Signals that an I/O exception of some sort has occurred
+     */
+
+    private static IvParameterSpec getInitVectorAES(Path byteFile) throws IOException {
+        try (DataInputStream stream = new DataInputStream(new FileInputStream(byteFile.toFile()))) {
+            byte[] bytes = new byte[16];
+            stream.readFully(bytes);
+            return new IvParameterSpec(bytes);
+        }
     }
 
     // decrypt 3DES
