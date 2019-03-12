@@ -1,79 +1,45 @@
 package be.pxl.basicSecurity.appDev;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Scanner;
-
-/**
- * Application class that encrypts and decrypts a specified file, using AES
- * and 3DES symmetric encryption algorithms
- */
 
 // TODO write doc for this class
-public class SymmetricCryptoApp {
-    public static void main(String[] args) {
-        try (Scanner in = new Scanner(System.in)) {
-            String filePath = "";
-            String outputFileEncName = "";
-            String outputFileDecName = "";
-            String ivByteFileName = "";
-            while (filePath.equals("") || outputFileEncName.equals("")) {
-                System.out.print("Give me a path to a file: ");
-                filePath = in.nextLine();
-                System.out.print("Give me a name for the encrypted file: ");
-                outputFileEncName = in.nextLine();
-                System.out.print("Give me a name for the decrypted file: ");
-                outputFileDecName = in.nextLine();
-                System.out.print("Give me a name for the IV bytefile: ");
-                ivByteFileName = in.nextLine();
 
-            }
+/**
+ * Application class that encrypts and decrypts a specified file, using AES symmetric encryption algorithms
+ */
 
-            Path inputFile = Paths.get(filePath);
-            Path outputFileEnc = inputFile.getParent().resolve(outputFileEncName);
-            Path outputFileDec = inputFile.getParent().resolve(outputFileDecName);
-            Path ivByteFile = inputFile.getParent().resolve(ivByteFileName);
-            SecretKey key = generateRandomAESKey(AESKeySize.SIZE_128);
-            IvParameterSpec iv = generateInitVector(ivByteFile);
-            encryptAES(key, iv, inputFile, outputFileEnc);
-            decryptAES(key, getInitVectorAES(ivByteFile), outputFileEnc, outputFileDec);
+public class AESEncryption {
 
-            System.out.println();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private AESEncryption() {
     }
 
-
     /**
-     * Decrypt a file, specified by a given path
+     * Decrypts a file, specified by a given path.
      *
-     * @param key        The AES key being used
-     * @param initVector The initialization vector being used
-     * @param inputFile  Specifies the path to the file to decrypt
-     * @param outputFile Specifies the path to the decrypted file
+     * @param key        The AES key being used.
+     * @param initVector The initialization vector being used.
+     * @param inputFile  Specifies the path to the file to decrypt.
+     * @param outputFile Specifies the path to the decrypted file.
      * @throws NoSuchAlgorithmException           When a particular cryptographic algorithm is requested
-     *                                            but is not available in the environment
+     *                                            but is not available in the environment.
      * @throws NoSuchPaddingException             When the specified padding pattern isn't available in the
-     *                                            environment
-     * @throws InvalidAlgorithmParameterException
-     * @throws InvalidKeyException
-     * @throws IOException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
+     *                                            environment.
+     * @throws InvalidAlgorithmParameterException This is the exception for invalid or inappropriate algorithm
+     *                                            parameters.
+     * @throws InvalidKeyException                This is the exception for invalid keys.
+     * @throws IOException                        Signals that an I/O exception of some sort has occurred.
+     * @throws BadPaddingException                Signals that an invalid padding standard has been passed.
+     * @throws IllegalBlockSizeException          Signals an inappropriate block size being requested.
      */
 
-    //TODO Refactor duplicate code in encryptAES() and decryptAES()
-    private static void decryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
+    public static void decryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
         if (!key.getAlgorithm().equals("AES")) {
             throw new NoSuchAlgorithmException();
@@ -85,7 +51,7 @@ public class SymmetricCryptoApp {
     }
 
     /**
-     * Encrypt a file in AES, utilizing cipher block chaining and PKCS5 padding specification
+     * Encrypts a file in AES, utilizing cipher block chaining and PKCS#5 (= PKCS#7 internally) padding specification
      *
      * @param key        The AES key being used
      * @param initVector The initialization vector being used
@@ -102,7 +68,7 @@ public class SymmetricCryptoApp {
      * @throws IllegalBlockSizeException
      */
 
-    private static void encryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
+    public static void encryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
         if (!key.getAlgorithm().equals("AES")) {
             throw new NoSuchAlgorithmException();
@@ -122,7 +88,7 @@ public class SymmetricCryptoApp {
      * @param c          The cipher, specifying the used algorithm
      */
 
-    private static void runAlgorithm(Path inputFile, Path outputFile, Cipher c) throws IOException, IllegalBlockSizeException, BadPaddingException {
+    public static void runAlgorithm(Path inputFile, Path outputFile, Cipher c) throws IOException, IllegalBlockSizeException, BadPaddingException {
         try (FileInputStream fileInputStream = new FileInputStream(inputFile.toString());
              FileOutputStream fileOutputStream = new FileOutputStream(outputFile.toString())) {
             byte[] inputBytes = new byte[(int) inputFile.toFile().length()];
@@ -140,10 +106,11 @@ public class SymmetricCryptoApp {
      *                                  but is not available in the environment
      */
 
-    private static SecretKey generateRandomAESKey(AESKeySize length) throws NoSuchAlgorithmException {
+    public static SecretKey generateRandomAESKey(AESKeySize length) throws NoSuchAlgorithmException {
         KeyGenerator kg = KeyGenerator.getInstance("AES");
         kg.init(length.getLength(), new SecureRandom());
-        return kg.generateKey();
+        SecretKey key = kg.generateKey();
+        return key;
     }
 
     /**
@@ -153,7 +120,7 @@ public class SymmetricCryptoApp {
      * @param path Path to the folder where the bytestream will be stored
      */
 
-    private static IvParameterSpec generateInitVector(Path path) throws IOException {
+    public static IvParameterSpec generateInitVector(Path path) throws IOException {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[16];
         try (DataOutputStream stream = new DataOutputStream(new FileOutputStream(path.toFile()))) {
@@ -171,25 +138,11 @@ public class SymmetricCryptoApp {
      * @throws IOException Signals that an I/O exception of some sort has occurred
      */
 
-    private static IvParameterSpec getInitVectorAES(Path byteFile) throws IOException {
+    public static IvParameterSpec getInitVectorAES(Path byteFile) throws IOException {
         try (DataInputStream stream = new DataInputStream(new FileInputStream(byteFile.toFile()))) {
             byte[] bytes = new byte[16];
             stream.readFully(bytes);
             return new IvParameterSpec(bytes);
         }
-    }
-
-    // decrypt 3DES
-
-    // TODO Implement method
-    private static String decrypt3DES() {
-        throw new NotImplementedException();
-    }
-
-    // Encrypt 3DES
-
-    // TODO Implement method
-    private static String encrypt3DES() {
-        throw new NotImplementedException();
     }
 }

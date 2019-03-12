@@ -1,15 +1,16 @@
 package be.pxl.basicSecurity.appDev;
 
-public enum AESKeySize {
 
-    /**
-     * This enum specifies the valid bit lengths for AES keys in
-     * class SymmetricCryptoApp
-     * <p>
-     * NOTE: Keys of length higher than 128 bits require installation
-     * of Java Cryptography Extension (JCE) Unlimited Strength
-     * Jurisdiction Policy Files for JDK 8 and lower.
-     */
+/**
+ * This enum specifies the valid bit lengths for AES keys in
+ * class AESEncryption
+ * <p>
+ * NOTE: Keys of length higher than 128 bits require installation
+ * of Java Cryptography Extension (JCE) Unlimited Strength
+ * Jurisdiction Policy Files for JDK 8 and lower.
+ */
+
+public enum AESKeySize {
 
     SIZE_128(128),
     SIZE_192(192),
