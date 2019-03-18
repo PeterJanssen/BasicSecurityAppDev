@@ -2,15 +2,12 @@ package be.pxl.basicSecurity.appDev;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.file.Path;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-
-// TODO write doc for this class
 
 /**
  * This utility class offers services to encrypt and decrypt a specified file, using the AES symmetric encryption algorithm,
@@ -89,6 +86,9 @@ public class AESEncryption {
      * @param inputFile  The path to the file, containing the input of the algorithm
      * @param outputFile The path to the file, containing the output of the algorithm
      * @param c          The cipher, specifying the used algorithm
+     * @throws IOException               Signals that an I/O exception of some sort has occurred.
+     * @throws BadPaddingException       Signals that an invalid padding standard has been passed.
+     * @throws IllegalBlockSizeException Signals an inappropriate block size being requested.
      */
 
     public static void runAlgorithm(Path inputFile, Path outputFile, Cipher c) throws IOException, IllegalBlockSizeException, BadPaddingException {
@@ -102,11 +102,14 @@ public class AESEncryption {
     }
 
     /**
-     * Generates a random AES key, and saves that key
+     * Generates a random AES key, and saves that key on the location, specified by the given path
      *
      * @param length Length of the key in bits, specified by an instance of enum AESKeySize
+     * @param path   Path to the location where the key will be stored
+     * @return A randomly generated AES key of specified length
      * @throws NoSuchAlgorithmException When a particular cryptographic algorithm is requested
      *                                  but is not available in the environment
+     * @throws IOException              Signals that an I/O exception of some sort has occurred
      */
 
     public static SecretKey generateRandomAESKey(AESKeySize length, Path path) throws NoSuchAlgorithmException, IOException {
@@ -125,6 +128,8 @@ public class AESEncryption {
      * for block size = 16 bytes
      *
      * @param path Path to the folder where the bytestream will be stored
+     * @return a 128 bit length initialization vector
+     * @throws IOException Signals that an I/O exception of some sort has occurred
      */
 
     public static IvParameterSpec generateInitVector(Path path) throws IOException {
@@ -138,7 +143,8 @@ public class AESEncryption {
     }
 
     /**
-     * Gets an AES CBC initialization vector, based on
+     * Gets a an AES CBC initialization vector, based on a locally stored file containing the bytes to create
+     * the vector with
      *
      * @param byteFile The path to the file, containing the bytes to create the initialization vector
      * @return an instance of IvParameterSpec, based on a file containing 16 bytes of data
@@ -153,9 +159,24 @@ public class AESEncryption {
         }
     }
 
+    /**
+     * Gets an SecretKey AES key object, read from the file at the specified path
+     *
+     * @param keyFile the path to the file that contains the key object
+     * @return a SecretKey AES key object
+     * @throws IOException            Signals that an I/O exception of some sort has occurred
+     * @throws ClassNotFoundException Thrown when an application tries to load in a class through its string name,
+     *                                but no definition for the class with the specified name could be found
+     * @throws InvalidClassException  Signals the object read at the specified location did not contain an AES key
+     */
+
     public static SecretKey getKeyAES(Path keyFile) throws IOException, ClassNotFoundException {
         try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(keyFile.toFile()))) {
-            return  (SecretKey) stream.readObject();
+            SecretKey key = (SecretKey) stream.readObject();
+            if (!key.getAlgorithm().equals("AES")) {
+                throw new InvalidObjectException("The object at the specified path is not an AES key.");
+            }
+            return key;
         }
     }
 }
