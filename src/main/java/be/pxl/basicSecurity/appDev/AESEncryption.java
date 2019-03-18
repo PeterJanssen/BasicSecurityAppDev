@@ -2,6 +2,7 @@ package be.pxl.basicSecurity.appDev;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.file.Path;
 import java.security.InvalidAlgorithmParameterException;
@@ -12,7 +13,8 @@ import java.security.SecureRandom;
 // TODO write doc for this class
 
 /**
- * Application class that encrypts and decrypts a specified file, using AES symmetric encryption algorithms
+ * This utility class offers services to encrypt and decrypt a specified file, using the AES symmetric encryption algorithm,
+ * utilizing cipher block chaining and the PKCS#5 (interpreted as PKCS#7 internally) padding standard.
  */
 
 public class AESEncryption {
@@ -61,11 +63,12 @@ public class AESEncryption {
      *                                            but is not available in the environment
      * @throws NoSuchPaddingException             When the specified padding pattern isn't available in the
      *                                            environment
-     * @throws InvalidAlgorithmParameterException
-     * @throws InvalidKeyException
-     * @throws IOException
-     * @throws BadPaddingException
-     * @throws IllegalBlockSizeException
+     * @throws InvalidAlgorithmParameterException This is the exception for invalid or inappropriate algorithm
+     *                                            parameters.
+     * @throws InvalidKeyException                This is the exception for invalid keys.
+     * @throws IOException                        Signals that an I/O exception of some sort has occurred.
+     * @throws BadPaddingException                Signals that an invalid padding standard has been passed.
+     * @throws IllegalBlockSizeException          Signals an inappropriate block size being requested.
      */
 
     public static void encryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
@@ -99,17 +102,21 @@ public class AESEncryption {
     }
 
     /**
-     * Generates a random AES key
+     * Generates a random AES key, and saves that key
      *
      * @param length Length of the key in bits, specified by an instance of enum AESKeySize
      * @throws NoSuchAlgorithmException When a particular cryptographic algorithm is requested
      *                                  but is not available in the environment
      */
 
-    public static SecretKey generateRandomAESKey(AESKeySize length) throws NoSuchAlgorithmException {
+    public static SecretKey generateRandomAESKey(AESKeySize length, Path path) throws NoSuchAlgorithmException, IOException {
         KeyGenerator kg = KeyGenerator.getInstance("AES");
         kg.init(length.getLength(), new SecureRandom());
         SecretKey key = kg.generateKey();
+        byte[] bytes = new byte[length.getLength() / 8];
+        try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
+            stream.writeObject(key);
+        }
         return key;
     }
 
@@ -143,6 +150,12 @@ public class AESEncryption {
             byte[] bytes = new byte[16];
             stream.readFully(bytes);
             return new IvParameterSpec(bytes);
+        }
+    }
+
+    public static SecretKey getKeyAES(Path keyFile) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(keyFile.toFile()))) {
+            return  (SecretKey) stream.readObject();
         }
     }
 }
