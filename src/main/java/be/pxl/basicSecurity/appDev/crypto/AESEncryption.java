@@ -2,7 +2,6 @@ package be.pxl.basicSecurity.appDev.crypto;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.file.Path;
 import java.security.*;
@@ -125,20 +124,5 @@ public class AESEncryption {
         byte[] bytes = new byte[16];
             random.nextBytes(bytes);
         return new IvParameterSpec(bytes);
-    }
-
-
-    /**
-     * Writes a passed IvParameterSpec to a passed path
-     *
-     * @param iv   the vector that needs to be written to a file
-     * @param path the path to where the vector needs to be written
-     * @throws IOException Signals that an I/O exception of some sort has occurred
-     */
-    public static void writeInitVectorToFile(IvParameterSpec iv, Path path) throws IOException {
-        byte[] bytes = iv.getIV();
-        try (FileOutputStream stream = new FileOutputStream(path.toFile())) {
-            stream.write(bytes);
-        }
     }
 }
