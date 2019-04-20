@@ -1,6 +1,4 @@
-package be.pxl.basicSecurity.appDev;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+package be.pxl.basicSecurity.appDev.crypto;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -9,7 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Generates a SHA-256 hash
+ * This utility class generates a SHA-256 hash
  */
 
 public class HashSHA256 {

@@ -1,13 +1,11 @@
-package be.pxl.basicSecurity.appDev;
+package be.pxl.basicSecurity.appDev.crypto;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.file.Path;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.security.*;
 
 /**
  * This utility class offers services to encrypt and decrypt a specified file, using the AES symmetric encryption algorithm,
@@ -38,9 +36,9 @@ public class AESEncryption {
      * @throws IllegalBlockSizeException          Signals an inappropriate block size being requested.
      */
 
-    public static void decryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
+    public static void decryptAES(Key key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
-        if (!key.getAlgorithm().equals("AES")) {
+        if (!key.getAlgorithm().equals(UsableAlgorithm.AES.getAlgorithm())) {
             throw new NoSuchAlgorithmException();
         }
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -68,9 +66,9 @@ public class AESEncryption {
      * @throws IllegalBlockSizeException          Signals an inappropriate block size being requested.
      */
 
-    public static void encryptAES(SecretKey key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
+    public static void encryptAES(Key key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
-        if (!key.getAlgorithm().equals("AES")) {
+        if (!key.getAlgorithm().equals(UsableAlgorithm.AES.getAlgorithm())) {
             throw new NoSuchAlgorithmException();
         }
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -91,92 +89,56 @@ public class AESEncryption {
      * @throws IllegalBlockSizeException Signals an inappropriate block size being requested.
      */
 
-    public static void runAlgorithm(Path inputFile, Path outputFile, Cipher c) throws IOException, IllegalBlockSizeException, BadPaddingException {
+    private static void runAlgorithm(Path inputFile, Path outputFile, Cipher c) throws IOException, IllegalBlockSizeException, BadPaddingException {
         try (FileInputStream fileInputStream = new FileInputStream(inputFile.toString());
              FileOutputStream fileOutputStream = new FileOutputStream(outputFile.toString())) {
             byte[] inputBytes = new byte[(int) inputFile.toFile().length()];
             fileInputStream.read(inputBytes);
-            byte[] outputBytes = c.doFinal(inputBytes);
-            fileOutputStream.write(outputBytes);
+            fileOutputStream.write(c.doFinal(inputBytes));
         }
     }
 
     /**
-     * Generates a random AES key, and saves that key on the location, specified by the given path
+     * Generates a random AES key
      *
      * @param length Length of the key in bits, specified by an instance of enum AESKeySize
-     * @param path   Path to the location where the key will be stored
      * @return A randomly generated AES key of specified length
      * @throws NoSuchAlgorithmException When a particular cryptographic algorithm is requested
      *                                  but is not available in the environment
-     * @throws IOException              Signals that an I/O exception of some sort has occurred
      */
 
-    public static SecretKey generateRandomAESKey(AESKeySize length, Path path) throws NoSuchAlgorithmException, IOException {
-        KeyGenerator kg = KeyGenerator.getInstance("AES");
+    public static Key generateRandomAESKey(KeySize length) throws NoSuchAlgorithmException {
+        KeyGenerator kg = KeyGenerator.getInstance(UsableAlgorithm.AES.getAlgorithm());
         kg.init(length.getLength(), new SecureRandom());
-        SecretKey key = kg.generateKey();
-        byte[] bytes = new byte[length.getLength() / 8];
-        try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
-            stream.writeObject(key);
-        }
-        return key;
+        return kg.generateKey();
     }
 
     /**
      * Generates a random initialization vector for the initial AES CBC cipher block
      * for block size = 16 bytes
      *
-     * @param path Path to the folder where the bytestream will be stored
      * @return a 128 bit length initialization vector
-     * @throws IOException Signals that an I/O exception of some sort has occurred
      */
 
-    public static IvParameterSpec generateInitVector(Path path) throws IOException {
+    public static IvParameterSpec generateInitVector() {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[16];
-        try (DataOutputStream stream = new DataOutputStream(new FileOutputStream(path.toFile()))) {
             random.nextBytes(bytes);
-            stream.write(bytes);
-        }
         return new IvParameterSpec(bytes);
     }
 
+
     /**
-     * Gets a an AES CBC initialization vector, based on a locally stored file containing the bytes to create
-     * the vector with
+     * Writes a passed IvParameterSpec to a passed path
      *
-     * @param byteFile The path to the file, containing the bytes to create the initialization vector
-     * @return an instance of IvParameterSpec, based on a file containing 16 bytes of data
+     * @param iv   the vector that needs to be written to a file
+     * @param path the path to where the vector needs to be written
      * @throws IOException Signals that an I/O exception of some sort has occurred
      */
-
-    public static IvParameterSpec getInitVectorAES(Path byteFile) throws IOException {
-        try (DataInputStream stream = new DataInputStream(new FileInputStream(byteFile.toFile()))) {
-            byte[] bytes = new byte[16];
-            stream.readFully(bytes);
-            return new IvParameterSpec(bytes);
-        }
-    }
-
-    /**
-     * Gets an SecretKey AES key object, read from the file at the specified path
-     *
-     * @param keyFile the path to the file that contains the key object
-     * @return a SecretKey AES key object
-     * @throws IOException            Signals that an I/O exception of some sort has occurred
-     * @throws ClassNotFoundException Thrown when an application tries to load in a class through its string name,
-     *                                but no definition for the class with the specified name could be found
-     * @throws InvalidClassException  Signals the object read at the specified location did not contain an AES key
-     */
-
-    public static SecretKey getKeyAES(Path keyFile) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(keyFile.toFile()))) {
-            SecretKey key = (SecretKey) stream.readObject();
-            if (!key.getAlgorithm().equals("AES")) {
-                throw new InvalidObjectException("The object at the specified path is not an AES key.");
-            }
-            return key;
+    public static void writeInitVectorToFile(IvParameterSpec iv, Path path) throws IOException {
+        byte[] bytes = iv.getIV();
+        try (FileOutputStream stream = new FileOutputStream(path.toFile())) {
+            stream.write(bytes);
         }
     }
 }
