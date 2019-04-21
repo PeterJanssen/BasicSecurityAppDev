@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<GridPane xmlns:fx="http://javafx.com/fxml" fx:controller="be.pxl.basicSecurity.appDev.crypto.Controller">
+    <stylesheets>
+        <URL value="@../css/CryptoAppDecryptionScreen.css"/>
+    </stylesheets>
+    <VBox GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="3">
+        <Label text="Decryption"/>
+        <Label text="Please fill in the form and click 'Start decrypting' to start decrypting the message."/>
+    </VBox>
+    <ImageView GridPane.rowIndex="0" GridPane.columnIndex="3" fitHeight="100" fitWidth="100">
+        <Image url="@../images/Decrypt.png"/>
+    </ImageView>
+    <VBox GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="1">
+        <HBox>
+            <Label text="File 1"/>
+            <TextField promptText="Path to file 1"/>
+            <Button text="Open file 1"/>
+        </HBox>
+        <HBox>
+            <Label text="File 2"/>
+            <TextField promptText="Path to file 2"/>
+            <Button text="Open file 2"/>
+        </HBox>
+        <HBox>
+            <Label text="File 3"/>
+            <TextField promptText="Path to file 3"/>
+            <Button text="Open file 3"/>
+        </HBox>
+        <HBox>
+            <Label text="Public A"/>
+            <TextField promptText="Path to public A"/>
+            <Button text="Open public A"/>
+        </HBox>
+        <HBox>
+            <Label text="Private B"/>
+            <TextField promptText="Path to private B"/>
+            <Button text="Open private B"/>
+        </HBox>
+    </VBox>
+    <VBox GridPane.rowIndex="2" GridPane.columnIndex="0">
+        <Label text="Message"/>
+        <HBox>
+            <ImageView fitHeight="100" fitWidth="100" onMousePressed="#OpenHomePage">
+                <Image url="@../images/left-arrow.png"/>
+            </ImageView>
+            <Label text="Return"/>
+        </HBox>
+    </VBox>
+    <TextArea promptText="When 'start decrypting' is pressed this box will contain a message if decrypted hash and calculated hash are the same or not. If equal: green with a check sign and message (hash okay and decrypted message). If not equal or an error has occured: red background with a cross and hash not okay or error stacktrace."
+              GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    <ImageView GridPane.rowIndex="2" GridPane.columnIndex="2" fitHeight="100" fitWidth="100">
+        <Image url="@../images/cross-remove-sign.png"/>
+    </ImageView>
+    <Button GridPane.rowIndex="2" GridPane.columnIndex="3" text="Start decrypting"/>
+</GridPane>

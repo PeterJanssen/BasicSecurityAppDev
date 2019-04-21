@@ -1,0 +1,17 @@
+.label {
+    -fx-font-family: "Arial";
+}
+
+#toplabel {
+    -fx-font: 32pt bold;
+}
+
+.leftAndRightLabels {
+    -fx-font: 24pt bold;
+}
+
+.vbox {
+    -fx-border-color: black;
+    -fx-border-width: 5;
+    -fx-padding: 10;
+}
