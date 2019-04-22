@@ -1,0 +1,18 @@
+.label {
+    -fx-font-family: "Arial";
+    -fx-font-size: 12pt;
+}
+
+#titleLabel {
+    -fx-font-size: 20pt;
+    -fx-font-weight: bold;
+}
+
+#descriptionLabel {
+    -fx-font-size: 15pt;
+    -fx-font-family: italic;
+}
+
+.text-field {
+    -fx-pref-width: 250pt;
+}

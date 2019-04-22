@@ -12,7 +12,7 @@ public class CryptoApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/CryptoAppStartScreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/StartScreen.fxml"));
         Scene scene = new Scene(root,1200,600);
         stage.setTitle("CryptoApp");
         stage.setScene(scene);

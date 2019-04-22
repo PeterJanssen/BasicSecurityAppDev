@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<GridPane alignment="CENTER" hgap="10.0" vgap="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.pxl.basicSecurity.appDev.crypto.Controller">
+    <stylesheets>
+        <URL value="@../css/CryptoAppForm.css" />
+    </stylesheets>
+    <padding>
+        <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+    </padding>
+    <children>
+
+        <VBox prefHeight="186.0" prefWidth="495.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <children>
+                <Label text="Message" />
+                <TextArea prefHeight="200.0" prefWidth="200.0" promptText="When 'start encrypting' is pressed this box will contain a message.If the message is encrypted and saved successfully it will contain 'message encrypted and saved successfully' and a check sign with a green background will be shown.If the message was not encrypted successfully it will contain 'Message not encrypted successfully' or if the message was not saved correctly it will contain 'Message not saved successfully' and a cross with a red background will be shown. The error stacktrace will be appended underneath." />
+            </children>
+        </VBox>
+        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
+            <GridPane.margin>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </GridPane.margin>
+            <children>
+                <Button text="Save file 1" />
+                <Button text="Save file 2" />
+                <Button text="Save file 3" />
+                <Button mnemonicParsing="false" text="Choose message file" wrapText="true" />
+            </children>
+        </VBox>
+        <VBox GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0">
+            <children>
+                <Label id="titleLabel" text="Encryption - message encryption" wrapText="true" />
+                <Label id="descriptionLabel" text="Please fill in the form and click 'Start decrypting' to start encrypting the message." wrapText="true" />
+            </children>
+        </VBox>
+        <ImageView fitHeight="100" fitWidth="100" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="CENTER">
+            <image>
+                <Image url="@../images/Encrypt.png" />
+            </image>
+        </ImageView>
+        <VBox spacing="15.0" GridPane.rowIndex="1">
+            <GridPane.margin>
+                <Insets top="10.0" />
+            </GridPane.margin>
+            <children>
+                <Label text="File 1" />
+                <Label text="File 2" />
+                <Label text="File 3" />
+                <Label text="Message" />
+            </children>
+        </VBox>
+        <VBox GridPane.rowIndex="2">
+            <children>
+                <Label text="Return" />
+                <HBox>
+                    <children>
+                        <ImageView fitHeight="100" fitWidth="100" onMousePressed="#OpenHomePage">
+                            <image>
+                                <Image url="@../images/left-arrow.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+        <ImageView fitHeight="100" fitWidth="100" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+            <image>
+                <Image url="@../images/cross-remove-sign.png" />
+            </image>
+        </ImageView>
+        <Button text="Start encrypting" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1">
+            <GridPane.margin>
+                <Insets top="10.0" />
+            </GridPane.margin>
+            <children>
+                <TextField promptText="Path to file 1" />
+                <TextField promptText="Path to file 2" />
+                <TextField promptText="Path to file 3" />
+                <TextArea promptText="When you load a text file the included message will be shown here." />
+            </children>
+        </VBox>
+    </children>
+    <columnConstraints>
+        <ColumnConstraints />
+        <ColumnConstraints hgrow="ALWAYS" />
+        <ColumnConstraints />
+        <ColumnConstraints />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints vgrow="ALWAYS" />
+        <RowConstraints vgrow="ALWAYS" />
+        <RowConstraints vgrow="ALWAYS" />
+    </rowConstraints>
+</GridPane>

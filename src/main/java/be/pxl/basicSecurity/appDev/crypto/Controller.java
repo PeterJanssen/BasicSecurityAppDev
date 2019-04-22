@@ -1,11 +1,9 @@
 package be.pxl.basicSecurity.appDev.crypto;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -15,25 +13,25 @@ public class Controller {
 
     @FXML
     public void OpenHomePage() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/CryptoAppStartScreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/StartScreen.fxml"));
         setSceneAndRoot(root, "CryptoApp");
     }
 
     @FXML
     public void OpenDecryptionPage() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/CryptoAppDecryptionScreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/DecryptionScreen.fxml"));
         setSceneAndRoot(root, "Decryption Form");
     }
 
     @FXML
     public void OpenEncryptionKeyGenerationPage() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/CryptoAppEncryptionKeyGenerationScreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/EncryptionKeyGenScreen.fxml"));
         setSceneAndRoot(root, "EncryptionKey Form");
     }
 
     @FXML
     public void OpenEncryptionMessagePage() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/CryptoAppEncryptionMessageScreen.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/EncryptionMsgScreen.fxml"));
         setSceneAndRoot(root, "EncryptionMessage Form");
     }
 
