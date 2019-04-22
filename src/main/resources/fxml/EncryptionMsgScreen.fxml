@@ -20,8 +20,8 @@
 
         <VBox prefHeight="186.0" prefWidth="495.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
             <children>
-                <Label text="Message" />
-                <TextArea prefHeight="200.0" prefWidth="200.0" promptText="When 'start encrypting' is pressed this box will contain a message.If the message is encrypted and saved successfully it will contain 'message encrypted and saved successfully' and a check sign with a green background will be shown.If the message was not encrypted successfully it will contain 'Message not encrypted successfully' or if the message was not saved correctly it will contain 'Message not saved successfully' and a cross with a red background will be shown. The error stacktrace will be appended underneath." />
+                <Label text="Output" />
+                <TextArea prefHeight="200.0" prefWidth="200.0" promptText="When 'start encrypting' is pressed this box will contain extra information. If the message is encrypted and saved successfully it will contain 'Message encrypted and saved successfully' and a check sign with a green background will be shown. If the message was not encrypted successfully it will contain 'Message not encrypted successfully' or if the message was not saved correctly it will contain 'Message not saved successfully' and a cross with a red background will be shown. The error stacktrace will be appended underneath." />
             </children>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
