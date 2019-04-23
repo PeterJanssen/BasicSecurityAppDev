@@ -64,7 +64,12 @@ public class DecryptionController {
                 new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
         PrivateKey privateKey = kf.generatePrivate(spec);
-        System.out.print(privateKey.toString());
+
+        Key AESKey = RSAEncryption.decryptSymmetricKeyRSA(privateKey, fileCollector.getFileTwo().toPath(), KeySize.SIZE_2048, UsableAlgorithm.AES);
+        AESEncryption.decryptAES(AESKey, IOCrypto.readInitVectorFromFile(
+                Paths.get("C:\\Users\\11702008\\Documents\\School\\Jaar 2\\S2\\Basic security\\Groepsopdracht\\Github repo\\BasicSecurityAppDev\\src\\main\\resources\\iv.txt")),
+                fileCollector.getFileOne().toPath(),
+                Paths.get("C:\\Users\\11702008\\Documents\\School\\Jaar 2\\S2\\Basic security\\Groepsopdracht\\Github repo\\BasicSecurityAppDev\\src\\main\\resources\\decFile.txt"));
     }
 
     private Stage getStage(ActionEvent actionEvent) {

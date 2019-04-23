@@ -57,7 +57,7 @@
                 <Insets top="10.0"/>
             </GridPane.margin>
             <children>
-                <TextField  promptText="Path to file 1"/>
+                <TextField fx:id="textFieldFile1" promptText="Path to file 1"/>
                 <TextField fx:id="textFieldFile2" promptText="Path to file 2"/>
                 <TextField fx:id="textFieldFile3" promptText="Path to file 3"/>
                 <TextField fx:id="textFieldPublicA" promptText="Path to public A"/>
