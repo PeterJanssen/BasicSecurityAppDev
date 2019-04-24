@@ -20,7 +20,7 @@
             <children>
                 <Label text="Output"/>
                 <TextArea prefHeight="200.0" prefWidth="200.0"
-                          promptText="When 'generate keys' is pressed this box will contain a message. If keys were generated successfully it will contain 'Keys generated and saved successfully' and a check sign with a green background will be shown. If keys were not generated successfully it will contain 'Keys not generated successfully' or if keys were not saved correctly it will contain 'Keys not saved successfully' and a cross with a red background will be shown. The error stacktrace will be appended underneath.">
+                          promptText="When 'generate keys' is pressed this box will contain a fileDecMessage. If keys were generated successfully it will contain 'Keys generated and saved successfully' and a check sign with a green background will be shown. If keys were not generated successfully it will contain 'Keys not generated successfully' or if keys were not saved correctly it will contain 'Keys not saved successfully' and a cross with a red background will be shown. The error stacktrace will be appended underneath.">
                 </TextArea>
             </children>
         </VBox>
@@ -40,7 +40,7 @@
             <children>
                 <Label id="titleLabel" text="Encryption - key generation"/>
                 <Label id="descriptionLabel"
-                       text="Please fill in the form and click 'Generate keys' to start generating and saving the keys. When keys are generated and saved successfully click 'Fill in message' to open a second window where you can encrypt a chosen message."
+                       text="Please fill in the form and click 'Generate keys' to start generating and saving the keys. When keys are generated and saved successfully click 'Fill in fileDecMessage' to open a second window where you can encrypt a chosen fileDecMessage."
                        wrapText="true"/>
             </children>
         </VBox>

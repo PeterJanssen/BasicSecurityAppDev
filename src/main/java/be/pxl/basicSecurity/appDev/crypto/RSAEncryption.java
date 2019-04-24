@@ -1,10 +1,10 @@
 package be.pxl.basicSecurity.appDev.crypto;
 
+import org.apache.commons.codec.Charsets;
+
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.security.*;
 
@@ -45,28 +45,28 @@ public class RSAEncryption {
         return new SecretKeySpec(decryptedBytes, 0, decryptedBytes.length, algorithm.getAlgorithm());
     }
 
-    public static void encryptHashFileRSA(PublicKey key, Path inputFilePath, Path outputFilePath) throws IOException,
+    public static void encryptHashFileRSA(PrivateKey key, Path inputFilePath, Path outputFilePath) throws IOException,
             NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException,
             InvalidKeyException {
         try (FileInputStream fileInputStream = new FileInputStream(inputFilePath.toString());
              FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath.toString())) {
             byte[] inputBytes = new byte[(int) inputFilePath.toFile().length()];
             fileInputStream.read(inputBytes);
-            Cipher c = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+            Cipher c = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             c.init(Cipher.ENCRYPT_MODE, key);
             fileOutputStream.write(c.doFinal(inputBytes));
         }
     }
 
 
-    public static void decryptHashFileRSA(PrivateKey key, Path inputFilePath, Path outputFilePath) throws IOException,
+    public static void decryptHashFileRSA(PublicKey key, Path inputFilePath, Path outputFilePath) throws IOException,
             NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException,
             InvalidKeyException {
         try (FileInputStream fileInputStream = new FileInputStream(inputFilePath.toString());
              FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath.toString())) {
             byte[] inputBytes = new byte[(int) inputFilePath.toFile().length()];
             fileInputStream.read(inputBytes);
-            Cipher c = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+            Cipher c = Cipher.getInstance("RSA/ECB/PKCS1Padding");
             c.init(Cipher.DECRYPT_MODE, key);
             fileOutputStream.write(c.doFinal(inputBytes));
         }

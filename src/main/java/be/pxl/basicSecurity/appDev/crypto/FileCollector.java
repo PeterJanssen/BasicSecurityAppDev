@@ -1,6 +1,5 @@
 package be.pxl.basicSecurity.appDev.crypto;
 
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -8,6 +7,8 @@ import javafx.stage.Stage;
 import java.io.File;
 
 public class FileCollector {
+    private File fileDecMessage;
+    private File fileDecHash;
     private File fileOne;
     private File fileTwo;
     private File fileThree;
@@ -15,6 +16,7 @@ public class FileCollector {
     private File filePublicB;
     private File filePrivateB;
     private File filePrivateA;
+    private File fileInitVector;
 
     public File ShowOpenDialog(Stage stage, TextInputControl textInputControl) {
         FileChooser fileChooser = CreateDialog();
@@ -36,12 +38,37 @@ public class FileCollector {
         return null;
     }
 
+    public File ShowSaveDialog(Stage stage) {
+        FileChooser fileChooser = CreateDialog();
+        File file = fileChooser.showSaveDialog(stage);
+        if (file != null) {
+            return file;
+        }
+        return null;
+    }
+
     private FileChooser CreateDialog() {
         FileChooser fileChooser = new FileChooser();
 
         FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
         fileChooser.getExtensionFilters().add(extensionFilter);
         return fileChooser;
+    }
+
+    public File getFileDecMessage() {
+        return fileDecMessage;
+    }
+
+    public void setFileDecMessage(File fileDecMessage) {
+        this.fileDecMessage = fileDecMessage;
+    }
+
+    public File getFileDecHash() {
+        return fileDecHash;
+    }
+
+    public void setFileDecHash(File fileDecHash) {
+        this.fileDecHash = fileDecHash;
     }
 
     public File getFileOne() {
@@ -98,5 +125,13 @@ public class FileCollector {
 
     public void setFilePrivateA(File filePrivateA) {
         this.filePrivateA = filePrivateA;
+    }
+
+    public File getFileInitVector() {
+        return fileInitVector;
+    }
+
+    public void setFileInitVector(File fileInitVector) {
+        this.fileInitVector = fileInitVector;
     }
 }

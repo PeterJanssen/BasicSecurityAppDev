@@ -23,7 +23,7 @@
             <children>
                 <Label text="Output"/>
                 <TextArea prefHeight="200.0" prefWidth="200.0"
-                          promptText="When 'start encrypting' is pressed this box will contain extra information. If the message is encrypted and saved successfully it will contain 'Message encrypted and saved successfully' and a check sign with a green background will be shown. If the message was not encrypted successfully it will contain 'Message not encrypted successfully' or if the message was not saved correctly it will contain 'Message not saved successfully' and a cross with a red background will be shown. The error stacktrace will be appended underneath."/>
+                          promptText="When 'start encrypting' is pressed this box will contain extra information. If the fileDecMessage is encrypted and saved successfully it will contain 'Message encrypted and saved successfully' and a check sign with a green background will be shown. If the fileDecMessage was not encrypted successfully it will contain 'Message not encrypted successfully' or if the fileDecMessage was not saved correctly it will contain 'Message not saved successfully' and a cross with a red background will be shown. The error stacktrace will be appended underneath."/>
             </children>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
@@ -34,15 +34,15 @@
                 <Button text="Save file 1" onAction="#SaveFile1"/>
                 <Button text="Save file 2" onAction="#SaveFile2"/>
                 <Button text="Save file 3" onAction="#SaveFile3"/>
-                <Button mnemonicParsing="false" text="Choose message file" wrapText="true"
+                <Button mnemonicParsing="false" text="Choose fileDecMessage file" wrapText="true"
                         onAction="#SaveMessage"/>
             </children>
         </VBox>
         <VBox GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0">
             <children>
-                <Label id="titleLabel" text="Encryption - message encryption" wrapText="true"/>
+                <Label id="titleLabel" text="Encryption - fileDecMessage encryption" wrapText="true"/>
                 <Label id="descriptionLabel"
-                       text="Please fill in the form and click 'Start decrypting' to start encrypting the message."
+                       text="Please fill in the form and click 'Start decrypting' to start encrypting the fileDecMessage."
                        wrapText="true"/>
             </children>
         </VBox>
@@ -83,7 +83,7 @@
                 <TextField fx:id="textFieldFile2" promptText="Path to file 2"/>
                 <TextField fx:id="textFieldFile3" promptText="Path to file 3"/>
                 <TextArea fx:id="textAreaMessage"
-                          promptText="When you load a text file the included message will be shown here."/>
+                          promptText="When you load a text file the included fileDecMessage will be shown here."/>
             </children>
         </VBox>
     </children>

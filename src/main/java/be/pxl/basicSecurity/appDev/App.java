@@ -81,8 +81,8 @@ public class App {
             AESEncryption.decryptAES(AESKey, IOCrypto.readInitVectorFromFile(ivByteFile), outputFileEnc, outputFileDec);
             String hash = HashSHA256.generateHash(inputFile);
             IOCrypto.writeHashToFile(hash, testHashFile);
-            RSAEncryption.encryptHashFileRSA(publicKey, testHashFile, encryptedHashFile);
-            RSAEncryption.decryptHashFileRSA(privateKey, encryptedHashFile, decryptedHashFile);
+            RSAEncryption.encryptHashFileRSA(privateKey, testHashFile, encryptedHashFile);
+            RSAEncryption.decryptHashFileRSA(publicKey, encryptedHashFile, decryptedHashFile);
             if (IOCrypto.readHashFromFile(testHashFile).equals(IOCrypto.readHashFromFile(decryptedHashFile))) {
                 System.out.println("De hashes waren hetzelfde!");
             }
