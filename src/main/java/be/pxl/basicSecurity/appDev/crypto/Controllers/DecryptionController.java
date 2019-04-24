@@ -4,18 +4,15 @@ import be.pxl.basicSecurity.appDev.crypto.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
 import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.Key;
@@ -64,15 +61,17 @@ public class DecryptionController {
 
             //Get Save location of decrypted message and decrypted hash
             fileCollector.setFileDecMessage(fileCollector.ShowSaveDialog(stage));
+
             fileCollector.setFileDecHash(new File(fileCollector.getFileDecMessage().getParent() + "/decHash.txt"));
-            String directoryThatContainsAllTheNecessaryFiles = fileCollector.getFileDecMessage().getParent();
+            String directoryThatContainsAllTheNecessaryFilesForDecrypting = System.getProperty("user.dir") + "\\files for decryption";
+
             //Get all the necessary files for decrypting
-            fileCollector.setFileOne(new File(directoryThatContainsAllTheNecessaryFiles + "/encFile.txt"));
-            fileCollector.setFileTwo(new File(directoryThatContainsAllTheNecessaryFiles + "/encAesKey.txt"));
-            fileCollector.setFileThree(new File(directoryThatContainsAllTheNecessaryFiles + "/encHash.txt"));
-            fileCollector.setFilePublicA(new File(directoryThatContainsAllTheNecessaryFiles + "/rsaPub.txt"));
-            fileCollector.setFilePrivateB(new File(directoryThatContainsAllTheNecessaryFiles + "/rsaPriv.txt"));
-            fileCollector.setFileInitVector(new File(directoryThatContainsAllTheNecessaryFiles + "/iv.txt"));
+            fileCollector.setFileOne(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/encFile.txt"));
+            fileCollector.setFileTwo(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/encAesKey.txt"));
+            fileCollector.setFileThree(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/encHash.txt"));
+            fileCollector.setFilePublicA(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/rsaEncPub.txt"));
+            fileCollector.setFilePrivateB(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/rsaDecPriv.txt"));
+            fileCollector.setFileInitVector(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/iv.txt"));
 
             //Set all the paths in the textboxes
             textFieldFile1.setText(fileCollector.getFileOne().toPath().toString());

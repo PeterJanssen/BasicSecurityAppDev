@@ -27,7 +27,7 @@
         <VBox GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0">
             <children>
                 <Label id="titleLabel" text="Decryption" />
-                <Label id="descriptionLabel" text="Please click on &quot;Start decrypting&quot; and create a new text file.&#13;The folder containing this file must contain all other necessary files for decryption!" wrapText="true" />
+                <Label id="descriptionLabel" text="Please click on &quot;Start decrypting&quot; and create a new text file.&#13;" wrapText="true" />
             </children>
         </VBox>
         <ImageView fitHeight="100" fitWidth="100" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="CENTER">
