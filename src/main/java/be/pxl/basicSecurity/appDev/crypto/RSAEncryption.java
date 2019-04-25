@@ -1,7 +1,5 @@
 package be.pxl.basicSecurity.appDev.crypto;
 
-import org.apache.commons.codec.Charsets;
-
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
