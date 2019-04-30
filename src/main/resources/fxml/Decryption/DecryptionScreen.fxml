@@ -21,13 +21,13 @@
         <VBox prefHeight="186.0" prefWidth="495.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
             <children>
                 <Label text="Message" />
-                <TextArea fx:id="textAreaMessage" promptText="This messagebox will contain the decrypted message. If something when wrong during the process extra info will be shown here." />
+                <TextArea fx:id="textAreaMessage" editable="false" promptText="This messagebox will contain the decrypted message. If something when wrong during the process extra info will be shown here." />
             </children>
         </VBox>
         <VBox GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0">
             <children>
                 <Label id="titleLabel" text="Decryption" />
-                <Label id="descriptionLabel" text="Please click on &quot;Start decrypting&quot; and create a new text file.&#13;" wrapText="true" />
+                <Label id="descriptionLabel" text="Please click on &quot;Start decrypting&quot; and select/create a text file which will contain the decrypted message.&#13;" wrapText="true" />
             </children>
         </VBox>
         <ImageView fitHeight="100" fitWidth="100" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="CENTER">
@@ -53,12 +53,12 @@
                 <Insets top="10.0" />
             </GridPane.margin>
             <children>
-                <TextField fx:id="textFieldFile1" promptText="Path to encrypted file" />
-                <TextField fx:id="textFieldFile2" promptText="Path to encrypted AES key" />
-                <TextField fx:id="textFieldFile3" promptText="Path to encrypted hash" />
-                <TextField fx:id="textFieldPublicA" promptText="Path to public A" />
-                <TextField fx:id="textFieldPrivateB" promptText="Path to private B" />
-                <TextField fx:id="textFieldInitVector" promptText="Path to init vector" />
+                <TextField fx:id="textFieldFile1" editable="false" promptText="Path to encrypted file" />
+                <TextField fx:id="textFieldFile2" editable="false" promptText="Path to encrypted AES key" />
+                <TextField fx:id="textFieldFile3" editable="false" promptText="Path to encrypted hash" />
+                <TextField fx:id="textFieldPublicA" editable="false" promptText="Path to public A" />
+                <TextField fx:id="textFieldPrivateB" editable="false" promptText="Path to private B" />
+                <TextField fx:id="textFieldInitVector" editable="false" promptText="Path to init vector" />
             </children>
         </VBox>
         <Button onAction="#StartDecrypting" text="Start decrypting" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />

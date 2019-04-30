@@ -1,5 +1,0 @@
-Dit is een testfile,
-gebruikt voor symmetrische en- en decryptie.
-
-Auteur: Ben Merken
-Datum: 10 maart 2019, 15u.07

@@ -3,8 +3,14 @@ package be.pxl.basicSecurity.appDev.crypto;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.Key;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 public class IOCrypto {
 
@@ -63,15 +69,42 @@ public class IOCrypto {
      * @throws IOException Signals that an I/O exception of some sort has occurred.
      */
 
+    public static String readFile(Path path) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append(System.lineSeparator());
+            }
+            return sb.toString();
+        }
+    }
+
     public static String readHashFromFile(Path path) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toFile()))) {
             return reader.readLine();
         }
     }
 
-    public static void writeHashToFile(String hash, Path path) throws IOException {
+    public static void writeToFile(String hash, Path path) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()))) {
             writer.write(hash);
         }
+    }
+
+    public static PublicKey CreatePublicKeyFromFile(Path path) throws Exception {
+        byte[] keyBytes = Files.readAllBytes(path);
+        X509EncodedKeySpec spec =
+                new X509EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePublic(spec);
+    }
+
+    public static PrivateKey CreatePrivateKeyFromFile(Path path) throws Exception {
+        byte[] keyBytes = Files.readAllBytes(path);
+        PKCS8EncodedKeySpec spec =
+                new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate(spec);
     }
 }

@@ -9,94 +9,76 @@
 <?import javafx.scene.layout.*?>
 <?import java.net.URL?>
 
-<GridPane alignment="CENTER" hgap="10.0" prefHeight="577.0" prefWidth="895.0" vgap="10.0"
-          xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-          >
+<GridPane alignment="CENTER" hgap="10.0" prefHeight="577.0" prefWidth="895.0" vgap="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <stylesheets>
-        <URL value="@../../css/CryptoAppForm.css"/>
+        <URL value="@../../css/CryptoAppForm.css" />
     </stylesheets>
     <children>
         <VBox prefHeight="186.0" prefWidth="495.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
             <children>
-                <Label text="Output"/>
-                <TextArea prefHeight="200.0" prefWidth="200.0"
-                          promptText="When 'generate keys' is pressed this box will contain a fileDecMessage. If keys were generated successfully it will contain 'Keys generated and saved successfully' and a check sign with a green background will be shown. If keys were not generated successfully it will contain 'Keys not generated successfully' or if keys were not saved correctly it will contain 'Keys not saved successfully' and a cross with a red background will be shown. The error stacktrace will be appended underneath.">
+                <Label text="Output" />
+                <TextArea fx:id="textAreaMessage" editable="false" prefHeight="200.0" prefWidth="200.0" promptText="When 'generate keys' is pressed this box will contain a message. If keys were generated successfully it will contain 'Keys generated and saved successfully' and a check sign will be shown. If keys were not generated successfully it will contain 'Keys not generated successfully' or if keys were not saved correctly it will contain 'Keys not saved successfully' and a cross with a will be shown. The error stacktrace will be appended underneath.">
                 </TextArea>
             </children>
         </VBox>
         <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
             <GridPane.margin>
-                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </GridPane.margin>
             <children>
-                <Button text="Save private A" onAction="#SavePrivateA"/>
-                <Button text="Save public A" onAction="#SavePublicA"/>
-                <Button text="Save private B" onAction="#SavePrivateB"/>
-                <Button mnemonicParsing="false" text="Save public B" wrapText="true" onAction="#SavePublicB"/>
-                <Button mnemonicParsing="false" text="Generate keys" wrapText="true" onAction="#GenerateKeys"/>
+                <Button mnemonicParsing="false" onAction="#GenerateKeys" text="Generate keys" wrapText="true" />
             </children>
         </VBox>
         <VBox GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0">
             <children>
-                <Label id="titleLabel" text="Encryption - key generation"/>
-                <Label id="descriptionLabel"
-                       text="Please fill in the form and click 'Generate keys' to start generating and saving the keys. When keys are generated and saved successfully click 'Fill in fileDecMessage' to open a second window where you can encrypt a chosen fileDecMessage."
-                       wrapText="true"/>
+                <Label id="titleLabel" text="Encryption - key generation" />
+                <Label id="descriptionLabel" prefHeight="91.0" prefWidth="721.0" text="Please click 'Generate keys' to start generating and saving the keys. When keys are generated and saved successfully click 'Fill in Message' to open a second window where you can save and encrypt a chosen Message." wrapText="true" />
             </children>
         </VBox>
-        <ImageView fitHeight="100" fitWidth="100" GridPane.columnIndex="3" GridPane.halignment="CENTER"
-                   GridPane.rowIndex="0" GridPane.valignment="CENTER">
+        <ImageView fitHeight="100" fitWidth="100" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="0" GridPane.valignment="CENTER">
             <image>
-                <Image url="@../../images/Encrypt.png"/>
+                <Image url="@../../images/Encrypt.png" />
             </image>
         </ImageView>
         <VBox spacing="15.0" GridPane.rowIndex="1">
             <GridPane.margin>
-                <Insets top="10.0"/>
+                <Insets top="10.0" />
             </GridPane.margin>
             <children>
-                <Label text="Private A"/>
-                <Label text="Public A"/>
-                <Label text="Private B"/>
-                <Label text="Public B"/>
-                <Label text="Symmetrical key"/>
+                <Label text="Private A" />
+                <Label text="Public A" />
+                <Label text="Private B" />
+                <Label text="Public B" />
             </children>
         </VBox>
-        <fx:include source="../Partials/ReturnBackToStartScreen.fxml"/>
-        <ImageView fitHeight="100" fitWidth="100" GridPane.columnIndex="2" GridPane.halignment="CENTER"
-                   GridPane.rowIndex="2" GridPane.valignment="CENTER">
-            <image>
-                <Image url="@../../images/cross-remove-sign.png"/>
-            </image>
+        <fx:include source="../Partials/ReturnBackToStartScreen.fxml" />
+        <ImageView fx:id="imageView" fitHeight="100" fitWidth="100" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
         </ImageView>
-        <fx:include source="../Partials/OpenEncryptionMsgScreen.fxml"/>
-        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.columnSpan="2"
-              GridPane.rowIndex="1">
+        <fx:include source="../Partials/OpenEncryptionMsgScreen.fxml" />
+        <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1">
             <GridPane.margin>
-                <Insets top="10.0"/>
+                <Insets top="10.0" />
             </GridPane.margin>
             <children>
-                <TextField fx:id="textFieldPrivateA" promptText="Name private A"/>
-                <TextField fx:id="textFieldPublicA" promptText="Name public A"/>
-                <TextField fx:id="textFieldPrivateB" promptText="Name private B"/>
-                <TextField fx:id="textFieldPublicB" promptText="Name public B"/>
-                <RadioButton mnemonicParsing="false" selected="true" text="AES"/>
-                <RadioButton mnemonicParsing="false" text="DES"/>
+                <TextField fx:id="textFieldPrivateA" editable="false" promptText="Path to private A" />
+                <TextField fx:id="textFieldPublicA" editable="false" promptText="Path to public A" />
+                <TextField fx:id="textFieldPrivateB" editable="false" promptText="Path to private B" />
+                <TextField fx:id="textFieldPublicB" editable="false" promptText="Path to public B" />
             </children>
         </VBox>
     </children>
     <columnConstraints>
-        <ColumnConstraints/>
-        <ColumnConstraints hgrow="ALWAYS"/>
-        <ColumnConstraints/>
-        <ColumnConstraints/>
+        <ColumnConstraints />
+        <ColumnConstraints hgrow="ALWAYS" />
+        <ColumnConstraints />
+        <ColumnConstraints />
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints vgrow="ALWAYS"/>
-        <RowConstraints vgrow="ALWAYS"/>
-        <RowConstraints vgrow="ALWAYS"/>
+        <RowConstraints vgrow="ALWAYS" />
+        <RowConstraints vgrow="ALWAYS" />
+        <RowConstraints vgrow="ALWAYS" />
     </rowConstraints>
     <padding>
-        <Insets bottom="25.0" left="25.0" right="25.0" top="25.0"/>
+        <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
     </padding>
 </GridPane>

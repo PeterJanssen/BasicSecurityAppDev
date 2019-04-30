@@ -6,21 +6,22 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.File;
-import java.io.FileReader;
-import java.nio.file.Files;
+import java.io.IOException;
 import java.nio.file.Path;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.security.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import static be.pxl.basicSecurity.appDev.crypto.FileCollector.getDirectoryThatContainsAllTheOutputFiles;
 
 public class DecryptionController {
     @FXML
@@ -41,156 +42,166 @@ public class DecryptionController {
     private ImageView imageView;
 
     private FileCollector fileCollector;
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
 
     DecryptionController(FileCollector fileCollector) {
         this.fileCollector = fileCollector;
     }
 
-    public void StartDecrypting(ActionEvent actionEvent) throws Exception {
+    public void StartDecrypting(ActionEvent actionEvent) {
         try {
-            //Empty textArea and textFields
-            textAreaMessage.setText("");
-            textFieldFile1.setText("");
-            textFieldFile2.setText("");
-            textFieldFile3.setText("");
-            textFieldPublicA.setText("");
-            textFieldPrivateB.setText("");
-            textFieldInitVector.setText("");
+            //Empty textfields and textAreas and set all the paths in the textboxes
+            ReadyTheWindow();
 
-            Stage stage = getStage(actionEvent);
-
-            //Get Save location of decrypted message and decrypted hash
-            fileCollector.setFileDecMessage(fileCollector.ShowSaveDialog(stage));
-
-            fileCollector.setFileDecHash(new File(fileCollector.getFileDecMessage().getParent() + "/decHash.txt"));
-            String directoryThatContainsAllTheNecessaryFilesForDecrypting = System.getProperty("user.dir") + "\\files for decryption";
-
-            //Get all the necessary files for decrypting
-            fileCollector.setFileOne(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/encFile.txt"));
-            fileCollector.setFileTwo(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/encAesKey.txt"));
-            fileCollector.setFileThree(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/encHash.txt"));
-            fileCollector.setFilePublicA(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/rsaEncPub.txt"));
-            fileCollector.setFilePrivateB(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/rsaDecPriv.txt"));
-            fileCollector.setFileInitVector(new File(directoryThatContainsAllTheNecessaryFilesForDecrypting + "/iv.txt"));
-
-            //Set all the paths in the textboxes
-            textFieldFile1.setText(fileCollector.getFileOne().toPath().toString());
-            textFieldFile2.setText(fileCollector.getFileTwo().toPath().toString());
-            textFieldFile3.setText(fileCollector.getFileThree().toPath().toString());
-            textFieldPublicA.setText(fileCollector.getFilePublicA().toPath().toString());
-            textFieldPrivateB.setText(fileCollector.getFilePrivateB().toPath().toString());
-            textFieldInitVector.setText(fileCollector.getFileInitVector().toPath().toString());
+            //Get Save location of decrypted message and decrypted hash, hash is saved in the same folder
+            OpenSaveDialog(actionEvent);
 
             //Ensure that all files have been selected.
             if (!EnsureThatEveryFileHasBeenSelected()) {
-                SetImageView("@../../images/cross-remove-sign.png");
+                fileCollector.SetImageView(fileCollector.getCrossRemoveSign(), imageView);
                 return;
             }
 
+            //Ensure that a valid save location has been selected
             if (fileCollector.getFileDecMessage() == null || fileCollector.getFileDecHash() == null) {
                 textAreaMessage.setText("Please select a location to save your message and hash.");
-                SetImageView("@../../images/cross-remove-sign.png");
+                fileCollector.SetImageView(fileCollector.getCrossRemoveSign(), imageView);
                 return;
             }
 
-            //Get keys
-            PrivateKey privateKey = CreatePrivateKeyFromFile();
-            PublicKey publicKey = CreatePublicKeyFromFile();
+            //Get private key of receiver and public key of sender
+            getKeys();
 
-            //Decrypt AESKey
-            Key AESKey = RSAEncryption.decryptSymmetricKeyRSA(privateKey, fileCollector.getFileTwo().toPath(), KeySize.SIZE_2048, UsableAlgorithm.AES);
+            //Decrypt AESKey message and write to file
+            DecryptFiles();
 
-            //Decrypt message and write to file
-            AESEncryption.decryptAES(AESKey, IOCrypto.readInitVectorFromFile(
-                    fileCollector.getFileInitVector().toPath()),
-                    fileCollector.getFileOne().toPath(),
-                    fileCollector.getFileDecMessage().toPath());
-
-            //Write decrypted message to textArea
+            //Write decrypted message and hash of decrypted message to textArea
             WriteMessageAndHashOfDecodedMessageToTextArea();
-            //Write hash to file
-            Path pathToDecryptedHash = fileCollector.getFileDecHash().toPath();
-            RSAEncryption.decryptHashFileRSA(publicKey, fileCollector.getFileThree().toPath(), pathToDecryptedHash);
+            //Write hash of decrypted message to file
+            RSAEncryption.decryptHashFileRSA(publicKey, fileCollector.getEncryptedHash().toPath(),
+                    fileCollector.getFileDecHash().toPath());
 
             //Get SHA256 hash of original message
-            StringBuilder hashOfOriginalMessage = WriteMessageFromFileToTextArea(pathToDecryptedHash);
-            textAreaMessage.appendText(System.lineSeparator() + "Hash of original message" + System.lineSeparator() + hashOfOriginalMessage);
-            SetImageView("@../../images/tick-sign.png");
-        } catch (Exception e) {
-            textAreaMessage.setText("Please ensure that all the right files have been selected" + System.lineSeparator());
+            textAreaMessage.appendText(System.lineSeparator() + "Hash of original message"
+                    + System.lineSeparator() + IOCrypto.readFile(fileCollector.getFileDecHash().toPath()));
 
-            if (e.getMessage() != null) {
-                textAreaMessage.appendText(e.getMessage());
+
+            //Check if hash of original message equals hash of received message
+            if (IOCrypto.readHashFromFile(fileCollector.getFileDecHash().toPath()).equals(
+                    HashSHA256.generateHash(fileCollector.getFileDecMessage().toPath()))) {
+                textAreaMessage.appendText(System.lineSeparator()
+                        + "Hashes of this message and original message are the same!" +
+                        " This message can be trusted." + System.lineSeparator());
+                //Set imageview to ticksign so the user knows everything worked
+                fileCollector.SetImageView(fileCollector.getTickSign(), imageView);
+                SetPathsToTextFields();
+            } else {
+                textAreaMessage.appendText(System.lineSeparator()
+                        + "Hashes of this message and original message are NOT the same!" +
+                        " This message CANNOT be trusted." + System.lineSeparator());
+                fileCollector.SetImageView(fileCollector.getCrossRemoveSign(), imageView);
             }
-            SetImageView("@../../images/cross-remove-sign.png");
+        } catch (IOException e) {
+            FileChecker.ExceptionOccurred(fileCollector, imageView, "Some of the files could not be found."
+                    + System.lineSeparator(), textAreaMessage, e);
+        } catch (NoSuchAlgorithmException e) {
+            FileChecker.ExceptionOccurred(fileCollector, imageView, "Something went wrong when decrypting."
+                    + System.lineSeparator(), textAreaMessage, e);
+        } catch (InvalidKeyException e) {
+            FileChecker.ExceptionOccurred(fileCollector, imageView, "An invalid key has been used for decryption."
+                    + System.lineSeparator(), textAreaMessage, e);
+        } catch (Exception e) {
+            FileChecker.ExceptionOccurred(fileCollector, imageView, "Message was not decrypted successfully."
+                    + System.lineSeparator(), textAreaMessage, e);
         }
+    }
+
+    private void DecryptFiles() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IOException,
+            BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
+        Key AESKey = RSAEncryption.decryptSymmetricKeyRSA(privateKey, fileCollector.getEncryptedAesKeyFile().toPath(),
+                KeySize.SIZE_2048, UsableAlgorithm.AES);
+        AESEncryption.decryptAES(AESKey, IOCrypto.readInitVectorFromFile(
+                fileCollector.getFileInitVector().toPath()),
+                fileCollector.getEncryptedMessageFile().toPath(),
+                fileCollector.getFileDecMessage().toPath());
+    }
+
+    private void getKeys() throws Exception {
+        privateKey = IOCrypto.CreatePrivateKeyFromFile(fileCollector.getFilePrivateB().toPath());
+        publicKey = IOCrypto.CreatePublicKeyFromFile(fileCollector.getFilePublicA().toPath());
+    }
+
+    private void OpenSaveDialog(ActionEvent actionEvent) {
+        Stage stage = getStage(actionEvent);
+        List<String> extensions = new ArrayList<>();
+        extensions.add("*.txt");
+        fileCollector.setFileDecMessage(fileCollector.ShowSaveDialog(stage, getDirectoryThatContainsAllTheOutputFiles(),
+                "TXT files (*.txt)", extensions));
+        fileCollector.setFileDecHash(new File(fileCollector.getFileDecMessage().getParent()
+                + "/hash created at "
+                + new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + ".txt"));
+    }
+
+    private void ReadyTheWindow() {
+        textAreaMessage.setText("");
+        textFieldFile1.setText("");
+        textFieldFile2.setText("");
+        textFieldFile3.setText("");
+        textFieldPublicA.setText("");
+        textFieldPrivateB.setText("");
+        textFieldInitVector.setText("");
+    }
+
+    private void SetPathsToTextFields() {
+        //Set all the paths in the textboxes
+        textFieldFile1.setText(fileCollector.getEncryptedMessageFile().toPath().toString());
+        textFieldFile2.setText(fileCollector.getEncryptedAesKeyFile().toPath().toString());
+        textFieldFile3.setText(fileCollector.getEncryptedHash().toPath().toString());
+        textFieldPublicA.setText(fileCollector.getFilePublicA().toPath().toString());
+        textFieldPrivateB.setText(fileCollector.getFilePrivateB().toPath().toString());
+        textFieldInitVector.setText(fileCollector.getFileInitVector().toPath().toString());
     }
 
     private void WriteMessageAndHashOfDecodedMessageToTextArea() throws Exception {
         Path pathToDecryptedMessage = fileCollector.getFileDecMessage().toPath();
-        textAreaMessage.appendText(String.valueOf(WriteMessageFromFileToTextArea(pathToDecryptedMessage)));
+        String decryptedMessage = IOCrypto.readFile(pathToDecryptedMessage);
+        textAreaMessage.appendText(decryptedMessage);
 
         textAreaMessage.appendText("End of message" + System.lineSeparator() + "------------------------" + System.lineSeparator());
         //Get SHA256 hash of decoded message
         textAreaMessage.appendText("Hash of this message" + System.lineSeparator() + HashSHA256.generateHash(pathToDecryptedMessage));
-
-    }
-
-    private PrivateKey CreatePrivateKeyFromFile() throws Exception {
-        byte[] keyBytes = Files.readAllBytes(fileCollector.getFilePrivateB().toPath());
-        PKCS8EncodedKeySpec spec =
-                new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePrivate(spec);
-    }
-
-    private PublicKey CreatePublicKeyFromFile() throws Exception {
-        byte[] keyBytes = Files.readAllBytes(fileCollector.getFilePublicA().toPath());
-        X509EncodedKeySpec spec =
-                new X509EncodedKeySpec(keyBytes);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
-    }
-
-    private StringBuilder WriteMessageFromFileToTextArea(Path fileLocation) throws Exception {
-        StringBuilder sb = new StringBuilder();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(String.valueOf(fileLocation)))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append(System.lineSeparator());
-            }
-            return sb;
-        }
-    }
-
-    private void SetImageView(String uri) {
-        imageView.setImage(new Image(uri));
     }
 
     private boolean EnsureThatEveryFileHasBeenSelected() {
-        if (fileCollector.getFileInitVector() == null || !fileCollector.getFileInitVector().exists()) {
-            textAreaMessage.appendText("Please select a location for the file that contains your init vector file." + System.lineSeparator());
+        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getFileInitVector())) {
+            textAreaMessage.appendText("Please check the location for the file that contains your init vector file."
+                    + System.lineSeparator());
         }
 
-        if (fileCollector.getFileOne() == null || !fileCollector.getFileInitVector().exists()) {
-            textAreaMessage.appendText("Please select a location for the file that contains encrypted message. This is file 1." + System.lineSeparator());
+        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getEncryptedMessageFile())) {
+            textAreaMessage.appendText("Please check the location for the file that contains encrypted message." +
+                    " This is file 1." + System.lineSeparator());
         }
 
-        if (fileCollector.getFileTwo() == null || !fileCollector.getFileTwo().exists()) {
-            textAreaMessage.appendText("Please select a location for the file that contains encrypted AES key. This is file 2." + System.lineSeparator());
+        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getEncryptedAesKeyFile())) {
+            textAreaMessage.appendText("Please check the location for the file that contains encrypted AES key." +
+                    " This is file 2." + System.lineSeparator());
         }
 
-        if (fileCollector.getFileThree() == null || !fileCollector.getFileThree().exists()) {
-            textAreaMessage.appendText("Please select a location for the file that contains encrypted hash. This is file 3." + System.lineSeparator());
+        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getEncryptedHash())) {
+            textAreaMessage.appendText("Please check the location for the file that contains encrypted hash." +
+                    " This is file 3." + System.lineSeparator());
         }
 
-        if (fileCollector.getFilePublicA() == null || !fileCollector.getFilePublicA().exists()) {
-            textAreaMessage.appendText("Please select a location for the file that contains public key of the sender. This is public A." + System.lineSeparator());
+        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getFilePublicA())) {
+            textAreaMessage.appendText("Please check the location for the file that contains public key of the sender." +
+                    " This is public A." + System.lineSeparator());
         }
 
-        if (fileCollector.getFilePrivateB() == null || !fileCollector.getFilePrivateB().exists()) {
-            textAreaMessage.appendText("Please select a location for the file that contains the private key of the receiver. This is private B." + System.lineSeparator());
+        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getFilePrivateB())) {
+            textAreaMessage.appendText("Please check the location for the file that contains the private key of the receiver." +
+                    " This is private B." + System.lineSeparator());
         }
 
         return !textAreaMessage.getText().contains("Please");

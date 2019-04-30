@@ -8,6 +8,6 @@
 
 <VBox alignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.pxl.basicSecurity.appDev.crypto.Controllers.Controller">
     <children>
-        <Button onMousePressed="#OpenEncryptionMessagePage" text="Fill in fileDecMessage" />
+        <Button onMousePressed="#OpenEncryptionMessagePage" text="Fill in message" />
     </children>
 </VBox>
