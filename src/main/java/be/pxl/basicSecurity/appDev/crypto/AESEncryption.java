@@ -95,7 +95,7 @@ public class AESEncryption {
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
         c.init(Cipher.DECRYPT_MODE, key, initVector);
 
-        return c.doFinal(bytes).toString();
+        return new String(c.doFinal(bytes));
     }
 
     /**

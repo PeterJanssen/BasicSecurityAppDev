@@ -26,7 +26,7 @@ public class SteganographyApp {
 
             byte[] bytes = AESEncryption.encryptStringAES(originalText, key, iv);
             String decryptedText = AESEncryption.decryptStringAES(bytes, key, iv);
-            System.out.println(decodedText);
+            System.out.println(decryptedText);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException
                 | InvalidKeyException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
