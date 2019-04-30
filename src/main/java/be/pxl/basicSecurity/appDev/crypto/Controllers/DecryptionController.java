@@ -101,7 +101,7 @@ public class DecryptionController {
             Key AESKey = RSAEncryption.decryptSymmetricKeyRSA(privateKey, fileCollector.getFileTwo().toPath(), KeySize.SIZE_2048, UsableAlgorithm.AES);
 
             //Decrypt message and write to file
-            AESEncryption.decryptAES(AESKey, IOCrypto.readInitVectorFromFile(
+            AESEncryption.decryptFileAES(AESKey, IOCrypto.readInitVectorFromFile(
                     fileCollector.getFileInitVector().toPath()),
                     fileCollector.getFileOne().toPath(),
                     fileCollector.getFileDecMessage().toPath());

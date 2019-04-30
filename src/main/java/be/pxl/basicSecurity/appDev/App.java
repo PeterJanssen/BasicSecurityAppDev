@@ -101,11 +101,11 @@ public class App {
             IOCrypto.writeKeyToFile(privateKeyDec, decrypterPrivateKeyFile);
             IOCrypto.writeInitVectorToFile(iv, ivByteFile);
 
-            AESEncryption.encryptAES(IOCrypto.readKeyFromFile(AESKeyFile, UsableAlgorithm.AES, KeySize.SIZE_128), iv, inputFile, outputFileEnc);
+            AESEncryption.encryptFileAES(IOCrypto.readKeyFromFile(AESKeyFile, UsableAlgorithm.AES, KeySize.SIZE_128), iv, inputFile, outputFileEnc);
             byte[] encryptedAESKey = RSAEncryption.encryptSymmetricKeyRSA(publicKeyDec, AESKey, encryptedAESKeyFile);
             IOCrypto.writeEncryptedKeyToFile(encryptedAESKey, encryptedAESKeyFile);
             AESKey = RSAEncryption.decryptSymmetricKeyRSA(privateKeyDec, encryptedAESKeyFile, KeySize.SIZE_2048, UsableAlgorithm.AES);
-            AESEncryption.decryptAES(AESKey, IOCrypto.readInitVectorFromFile(ivByteFile), outputFileEnc, outputFileDec);
+            AESEncryption.decryptFileAES(AESKey, IOCrypto.readInitVectorFromFile(ivByteFile), outputFileEnc, outputFileDec);
             String hash = HashSHA256.generateHash(inputFile);
             IOCrypto.writeHashToFile(hash, testHashFile);
             RSAEncryption.encryptHashFileRSA(privateKeyEnc, testHashFile, encryptedHashFile);

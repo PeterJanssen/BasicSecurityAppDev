@@ -35,15 +35,15 @@ public class AESEncryption {
      * @throws IllegalBlockSizeException          Signals an inappropriate block size being requested.
      */
 
-    public static void decryptAES(Key key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
+    public static void decryptFileAES(Key key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
         if (!key.getAlgorithm().equals(UsableAlgorithm.AES.getAlgorithm())) {
-            throw new NoSuchAlgorithmException();
+            throw new NoSuchAlgorithmException("You should specify an AES key.");
         }
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
         c.init(Cipher.DECRYPT_MODE, key, initVector);
 
-        runAlgorithm(inputFile, outputFile, c);
+        runAlgorithmFile(inputFile, outputFile, c);
     }
 
     /**
@@ -65,15 +65,37 @@ public class AESEncryption {
      * @throws IllegalBlockSizeException          Signals an inappropriate block size being requested.
      */
 
-    public static void encryptAES(Key key, IvParameterSpec initVector, Path inputFile, Path outputFile) throws NoSuchAlgorithmException,
-            NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
+    public static void encryptFileAES(Key key, IvParameterSpec initVector, Path inputFile, Path outputFile)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException,
+            InvalidKeyException, IOException, BadPaddingException, IllegalBlockSizeException {
         if (!key.getAlgorithm().equals(UsableAlgorithm.AES.getAlgorithm())) {
-            throw new NoSuchAlgorithmException();
+            throw new NoSuchAlgorithmException("You should specify an AES key.");
         }
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
         c.init(Cipher.ENCRYPT_MODE, key, initVector);
 
-        runAlgorithm(inputFile, outputFile, c);
+        runAlgorithmFile(inputFile, outputFile, c);
+    }
+
+    public static byte[] encryptStringAES(String message, Key key, IvParameterSpec initVector)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        if (!key.getAlgorithm().equals(UsableAlgorithm.AES.getAlgorithm())) {
+            throw new NoSuchAlgorithmException("You should specify an AES key.");
+        }
+        Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        c.init(Cipher.ENCRYPT_MODE, key, initVector);
+
+        return c.doFinal(message.getBytes());
+    }
+
+    public static String decryptStringAES(byte[] bytes, Key key, IvParameterSpec initVector)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        c.init(Cipher.DECRYPT_MODE, key, initVector);
+
+        return c.doFinal(bytes).toString();
     }
 
     /**
@@ -88,7 +110,7 @@ public class AESEncryption {
      * @throws IllegalBlockSizeException Signals an inappropriate block size being requested.
      */
 
-    private static void runAlgorithm(Path inputFile, Path outputFile, Cipher c) throws IOException, IllegalBlockSizeException, BadPaddingException {
+    private static void runAlgorithmFile(Path inputFile, Path outputFile, Cipher c) throws IOException, IllegalBlockSizeException, BadPaddingException {
         try (FileInputStream fileInputStream = new FileInputStream(inputFile.toString());
              FileOutputStream fileOutputStream = new FileOutputStream(outputFile.toString())) {
             byte[] inputBytes = new byte[(int) inputFile.toFile().length()];
@@ -122,7 +144,7 @@ public class AESEncryption {
     public static IvParameterSpec generateInitVector() {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[16];
-            random.nextBytes(bytes);
+        random.nextBytes(bytes);
         return new IvParameterSpec(bytes);
     }
 }
