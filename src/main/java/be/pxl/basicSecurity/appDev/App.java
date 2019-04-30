@@ -107,7 +107,7 @@ public class App {
             AESKey = RSAEncryption.decryptSymmetricKeyRSA(privateKeyDec, encryptedAESKeyFile, KeySize.SIZE_2048, UsableAlgorithm.AES);
             AESEncryption.decryptFileAES(AESKey, IOCrypto.readInitVectorFromFile(ivByteFile), outputFileEnc, outputFileDec);
             String hash = HashSHA256.generateHash(inputFile);
-            IOCrypto.writeHashToFile(hash, testHashFile);
+            IOCrypto.writeToFile(hash, testHashFile);
             RSAEncryption.encryptHashFileRSA(privateKeyEnc, testHashFile, encryptedHashFile);
             RSAEncryption.decryptHashFileRSA(publicKeyEnc, encryptedHashFile, decryptedHashFile);
             if (IOCrypto.readHashFromFile(testHashFile).equals(IOCrypto.readHashFromFile(decryptedHashFile))) {

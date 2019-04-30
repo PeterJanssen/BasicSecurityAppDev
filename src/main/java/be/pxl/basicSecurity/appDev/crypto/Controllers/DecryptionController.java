@@ -121,7 +121,7 @@ public class DecryptionController {
             BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
         Key AESKey = RSAEncryption.decryptSymmetricKeyRSA(privateKey, fileCollector.getEncryptedAesKeyFile().toPath(),
                 KeySize.SIZE_2048, UsableAlgorithm.AES);
-        AESEncryption.decryptAES(AESKey, IOCrypto.readInitVectorFromFile(
+        AESEncryption.decryptFileAES(AESKey, IOCrypto.readInitVectorFromFile(
                 fileCollector.getFileInitVector().toPath()),
                 fileCollector.getEncryptedMessageFile().toPath(),
                 fileCollector.getFileDecMessage().toPath());

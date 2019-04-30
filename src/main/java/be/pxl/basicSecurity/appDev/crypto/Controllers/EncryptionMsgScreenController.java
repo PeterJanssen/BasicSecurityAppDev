@@ -144,7 +144,7 @@ public class EncryptionMsgScreenController {
             IOCrypto.writeInitVectorToFile(iv, fileCollector.getFileInitVector().toPath());
 
             //Create encrypted AesKey, Write encoded keys, message and encoded hash of message to files
-            AESEncryption.encryptAES(IOCrypto.readKeyFromFile(fileCollector.getAesKey().toPath(),
+            AESEncryption.encryptFileAES(IOCrypto.readKeyFromFile(fileCollector.getAesKey().toPath(),
                     UsableAlgorithm.AES, KeySize.SIZE_128), iv, fileCollector.getFileDecMessage().toPath(),
                     fileCollector.getEncryptedMessageFile().toPath());
             byte[] encryptedAESKey = RSAEncryption.encryptSymmetricKeyRSA(
