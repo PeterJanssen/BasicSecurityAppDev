@@ -5,6 +5,7 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
 import java.nio.file.Path;
 import java.security.*;
+import java.util.Base64;
 
 /**
  * This utility class offers services to encrypt and decrypt a specified file, using the AES symmetric encryption algorithm,
@@ -77,7 +78,7 @@ public class AESEncryption {
         runAlgorithmFile(inputFile, outputFile, c);
     }
 
-    public static byte[] encryptStringAES(String message, Key key, IvParameterSpec initVector)
+    public static String  encryptStringAES(String message, Key key, IvParameterSpec initVector)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         if (!key.getAlgorithm().equals(UsableAlgorithm.AES.getAlgorithm())) {
@@ -86,16 +87,16 @@ public class AESEncryption {
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
         c.init(Cipher.ENCRYPT_MODE, key, initVector);
 
-        return c.doFinal(message.getBytes());
+        return Base64.getEncoder().encodeToString(c.doFinal(message.getBytes()));
     }
 
-    public static String decryptStringAES(byte[] bytes, Key key, IvParameterSpec initVector)
+    public static String decryptStringAES(String encryptedMessage, Key key, IvParameterSpec initVector)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
         c.init(Cipher.DECRYPT_MODE, key, initVector);
 
-        return new String(c.doFinal(bytes));
+        return new String(c.doFinal(Base64.getDecoder().decode(encryptedMessage)));
     }
 
     /**
