@@ -6,14 +6,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
 
 public class Controller {
+    @FXML
+    private Label hyperlinkLabel;
     private FileCollector fileCollector = new FileCollector();
+
     @FXML
     public void OpenHomePage(MouseEvent mouseEvent) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/StartScreen.fxml"));
@@ -61,5 +67,13 @@ public class Controller {
 
     private void CloseStageOfNode(Node node) {
         ((Stage) (node).getScene().getWindow()).close();
+    }
+
+    public void BrowseToWebsiteAuthorSymbols() {
+        try {
+            Desktop.getDesktop().browse(new URI("https://www.flaticon.com/authors/freepik"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

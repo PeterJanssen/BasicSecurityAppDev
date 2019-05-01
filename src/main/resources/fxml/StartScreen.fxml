@@ -62,7 +62,7 @@
             <children>
                 <Label text="Hybrid crypto system Basic Security Hogeschool PXL 2018-2019"/>
                 <Label text="Made by Ben Merken and Peter Janssen"/>
-                <Label text="Icons by https://www.flaticon.com/authors/freepik"/>
+                <Label fx:id="hyperlinkLabel" text="Icons by freepik" underline="true" onMousePressed="#BrowseToWebsiteAuthorSymbols"/>
             </children>
         </VBox>
     </bottom>
