@@ -1,6 +1,7 @@
 package be.pxl.basicSecurity.appDev.crypto.Controllers;
 
 import be.pxl.basicSecurity.appDev.crypto.*;
+import be.pxl.basicSecurity.appDev.steganography.LSB_encode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -12,6 +13,8 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import javax.crypto.spec.IvParameterSpec;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.security.Key;
@@ -46,10 +49,15 @@ public class EncryptionMsgScreenController {
     private Button encryptionButton;
     @FXML
     private Button SelectMessage;
+    @FXML
+    private Button encryptionButtonSteganography;
+    @FXML
+    private Button  SelectImageButton;
 
     private FileCollector fileCollector;
     private PrivateKey privateKeyEnc;
     private PublicKey publicKeyDec;
+    private BufferedImage imageForEncryption = null;
 
     EncryptionMsgScreenController(FileCollector fileCollector) {
         this.fileCollector = fileCollector;
@@ -86,23 +94,9 @@ public class EncryptionMsgScreenController {
         }
     }
 
-    private void HandleFileSaving() throws Exception {
-        //Ensure that a valid save location has been selected
-        if (fileCollector.getFileDecMessage() == null || fileCollector.getFileDecHash() == null) {
-            textAreaOutput.appendText("Please select a location to save your message and hash.");
-            fileCollector.SetImageView(fileCollector.getCrossRemoveSign(), imageView);
-            throw new Exception();
-        }
-
-        WriteMessageAndHashOfDecodedMessageToFile();
-        textAreaOutput.appendText("Message saved successfully.");
-        encryptionButton.disableProperty().setValue(false);
-        fileCollector.SetImageView(fileCollector.getTickSign(), imageView);
-    }
-
     public void SelectMessage(ActionEvent actionEvent) {
-        Stage stage = getStage(actionEvent);
         try {
+            Stage stage = getStage(actionEvent);
             EmptyTextFieldsAndAreas();
             //Open selectDialog and save hash of message in same folder
             List<String> extensions = new ArrayList<>();
@@ -112,7 +106,7 @@ public class EncryptionMsgScreenController {
             fileCollector.setFileDecHash(new File(getDirectoryThatContainsAllTheInputFiles() +
                     "/hash created at " +
                     new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()) + ".txt"));
-            textAreaMessage.appendText(IOCrypto.readFile(fileCollector.getFileDecMessage().toPath()));
+            textAreaMessage.setText(IOCrypto.readFile(fileCollector.getFileDecMessage().toPath()));
             HandleFileSaving();
         } catch (IOException e) {
             FileChecker.ExceptionOccurred(fileCollector, imageView, "Message was not saved successfully"
@@ -133,25 +127,25 @@ public class EncryptionMsgScreenController {
             //empty textFields and textAreas and set all the paths in the textboxes
             EmptyTextFieldsAndAreas();
 
-            //Create key from file
+            //Create keys from files
             createKeysFromFiles();
 
             //Create AES key and write to file
             Key AESKey = AESEncryption.generateRandomAESKey(KeySize.SIZE_128);
-            IOCrypto.writeKeyToFile(AESKey, fileCollector.getAesKey().toPath());
+            IOCrypto.writeKeyToFile(AESKey, fileCollector.getAesKeyForMessage().toPath());
             //Create init vector and write to file
             IvParameterSpec iv = AESEncryption.generateInitVector();
-            IOCrypto.writeInitVectorToFile(iv, fileCollector.getFileInitVector().toPath());
+            IOCrypto.writeInitVectorToFile(iv, fileCollector.getFileInitVectorForMessage().toPath());
 
             //Create encrypted AesKey, Write encoded keys, message and encoded hash of message to files
-            AESEncryption.encryptFileAES(IOCrypto.readKeyFromFile(fileCollector.getAesKey().toPath(),
+            AESEncryption.encryptFileAES(IOCrypto.readKeyFromFile(fileCollector.getAesKeyForMessage().toPath(),
                     UsableAlgorithm.AES, KeySize.SIZE_128), iv, fileCollector.getFileDecMessage().toPath(),
                     fileCollector.getEncryptedMessageFile().toPath());
             byte[] encryptedAESKey = RSAEncryption.encryptSymmetricKeyRSA(
-                    publicKeyDec, AESKey, fileCollector.getEncryptedAesKeyFile().toPath());
-            IOCrypto.writeEncryptedKeyToFile(encryptedAESKey, fileCollector.getEncryptedAesKeyFile().toPath());
+                    publicKeyDec, AESKey, fileCollector.getEncryptedAesKeyFileForMessage().toPath());
+            IOCrypto.writeEncryptedKeyToFile(encryptedAESKey, fileCollector.getEncryptedAesKeyFileForMessage().toPath());
             RSAEncryption.encryptHashFileRSA(
-                    privateKeyEnc, fileCollector.getFileDecHash().toPath(), fileCollector.getEncryptedHash().toPath());
+                    privateKeyEnc, fileCollector.getFileDecHash().toPath(), fileCollector.getEncryptedHashForMessage().toPath());
 
             //Ensure that all files have been created and saved.
             if (!EnsureThatEveryFileHasBeenSaved()) {
@@ -160,7 +154,7 @@ public class EncryptionMsgScreenController {
             }
             //Set imageview to ticksign so the user knows everything worked
             textAreaOutput.setText("Message, key and hash is encrypted and saved successfully.");
-            SetPathsToTextFields();
+            SetPathsToTextFields(false);
             fileCollector.SetImageView(fileCollector.getTickSign(), imageView);
         } catch (IOException e) {
             FileChecker.ExceptionOccurred(fileCollector, imageView, "Message, key or hash was not saved successfully."
@@ -175,19 +169,82 @@ public class EncryptionMsgScreenController {
 
     }
 
-    public void SelectImage(ActionEvent actionEvent) {
+    public void StartEncryptingMessageInImage() {
+        textAreaOutputSteganography.setText("");
+        try {
+            //Create keys from files
+            createKeysFromFiles();
+
+            //Create AES key and write to file
+            Key AESKey = AESEncryption.generateRandomAESKey(KeySize.SIZE_128);
+            IOCrypto.writeKeyToFile(AESKey, fileCollector.getAesKeyForImage().toPath());
+
+            //Create init vector and write to file
+            IvParameterSpec iv = AESEncryption.generateInitVector();
+            IOCrypto.writeInitVectorToFile(iv, fileCollector.getFileInitVectorForImage().toPath());
+
+            //Encrypt the message
+            String encText = AESEncryption.encryptStringAES(textAreaMessage.getText(), AESKey, iv);
+            //Hide message in the image and put it on the "internet"
+            int[] bits = LSB_encode.getMessageBits(encText);
+            LSB_encode.hideTheMessage(bits, imageForEncryption, fileCollector.getFileImage().toPath());
+
+            //Create encrypted AesKey, Write encoded keys and encoded hash of message to files
+            byte[] encryptedAESKey = RSAEncryption.encryptSymmetricKeyRSA(
+                    publicKeyDec, AESKey, fileCollector.getEncryptedAesKeyFileForImage().toPath());
+            IOCrypto.writeEncryptedKeyToFile(encryptedAESKey, fileCollector.getEncryptedAesKeyFileForImage().toPath());
+            RSAEncryption.encryptHashFileRSA(
+                    privateKeyEnc, fileCollector.getFileDecHash().toPath(), fileCollector.getEncryptedHashForImageMessage().toPath());
+
+            //Set imageview to ticksign so the user knows everything worked
+            textAreaOutputSteganography.setText("Message has been successfully encrypted and encoded into the image.");
+            SetPathsToTextFields(true);
+            fileCollector.SetImageView(fileCollector.getTickSign(), imageView);
+
+        } catch (Exception e) {
+            FileChecker.ExceptionOccurred(fileCollector, imageView, "Could not put encrypted message into image please try again."
+                    + System.lineSeparator(), textAreaOutputSteganography, e);
+        }
+    }
+
+    public void SelectImage(ActionEvent actionEvent) throws IOException {
         Stage stage = getStage(actionEvent);
+        textAreaOutputSteganography.setText("");
         List<String> extensions = new ArrayList<>();
         extensions.add("*.jpg");
         extensions.add("*.png");
-        File file = fileCollector.ShowSelectDialog(stage, System.getProperty("user.home") + "\\pictures", "Image Files (*.jpg and *.png)", extensions);
-        if (file != null) {
-            Image image = new Image(file.toURI().toString());
-            imageForSteganography.setImage(image);
-        } else {
+        File imageFile = fileCollector.ShowSelectDialog(stage, System.getProperty("user.home") + "\\pictures", "Image Files (*.jpg and *.png)", extensions);
+        if (imageFile == null) {
             textAreaOutputSteganography.appendText("Please select an image.");
+            encryptionButtonSteganography.disableProperty().setValue(true);
+            return;
+        }
+        if (textAreaMessage.getText().isEmpty()) {
+            textAreaOutputSteganography.appendText("Please fill in or select a message in the previous tab.");
+            encryptionButtonSteganography.disableProperty().setValue(true);
+            return;
+        }
+        //Set image in imageview
+        Image image = new Image(imageFile.toURI().toString());
+        imageForSteganography.setImage(image);
+        //Set image in an bufferedimage to ready it for the encryption process
+        imageForEncryption = ImageIO.read(imageFile);
+        encryptionButtonSteganography.disableProperty().setValue(false);
+    }
+
+    private void HandleFileSaving() throws Exception {
+        //Ensure that a valid save location has been selected
+        if (fileCollector.getFileDecMessage() == null || fileCollector.getFileDecHash() == null) {
+            textAreaOutput.appendText("Please select a location to save your message and hash.");
+            fileCollector.SetImageView(fileCollector.getCrossRemoveSign(), imageView);
+            throw new Exception();
         }
 
+        WriteMessageAndHashOfDecodedMessageToFile();
+        textAreaOutput.appendText("Message saved/selected successfully.");
+        encryptionButton.disableProperty().setValue(false);
+        SelectImageButton.disableProperty().setValue(false);
+        fileCollector.SetImageView(fileCollector.getTickSign(), imageView);
     }
 
     private void createKeysFromFiles() throws Exception {
@@ -200,11 +257,11 @@ public class EncryptionMsgScreenController {
             textAreaOutput.appendText("Please check this location for the file that contains the encrypted message." + System.lineSeparator());
         }
 
-        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getEncryptedAesKeyFile())) {
+        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getEncryptedAesKeyFileForMessage())) {
             textAreaOutput.appendText("Please check this location for the file that contains the encrypted AESkey." + System.lineSeparator());
         }
 
-        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getEncryptedHash())) {
+        if (FileChecker.CheckIfFileDoesntExist(fileCollector.getEncryptedHashForMessage())) {
             textAreaOutput.appendText("Please check this location for the file that contains the encrypted hash. " + System.lineSeparator());
         }
 
@@ -229,9 +286,16 @@ public class EncryptionMsgScreenController {
         textAreaOutput.setText("");
     }
 
-    private void SetPathsToTextFields() {
-        textFieldFile1.setText(fileCollector.getEncryptedMessageFile().toPath().toString());
-        textFieldFile2.setText(fileCollector.getEncryptedAesKeyFile().toPath().toString());
-        textFieldFile3.setText(fileCollector.getEncryptedHash().toPath().toString());
+    private void SetPathsToTextFields(boolean isImageEncryption) {
+        if (isImageEncryption){
+            textFieldFile1.setText(fileCollector.getFileImage().toPath().toString());
+            textFieldFile2.setText(fileCollector.getEncryptedAesKeyFileForImage().toPath().toString());
+            textFieldFile3.setText(fileCollector.getEncryptedHashForImageMessage().toPath().toString());
+        }else {
+            textFieldFile1.setText(fileCollector.getEncryptedMessageFile().toPath().toString());
+            textFieldFile2.setText(fileCollector.getEncryptedAesKeyFileForMessage().toPath().toString());
+            textFieldFile3.setText(fileCollector.getEncryptedHashForMessage().toPath().toString());
+        }
+
     }
 }

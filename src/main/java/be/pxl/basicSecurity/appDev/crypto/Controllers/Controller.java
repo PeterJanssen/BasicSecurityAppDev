@@ -6,7 +6,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -17,7 +16,6 @@ import java.net.URI;
 
 public class Controller {
     @FXML
-    private Label hyperlinkLabel;
     private FileCollector fileCollector = new FileCollector();
 
     @FXML

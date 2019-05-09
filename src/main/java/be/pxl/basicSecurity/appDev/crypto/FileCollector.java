@@ -22,16 +22,22 @@ public class FileCollector {
     private File fileDecHash;
 
     private File encryptedMessageFile;
-    private File encryptedAesKeyFile;
-    private File encryptedHash;
+    private File encryptedAesKeyFileForMessage;
+    private File encryptedAesKeyFileForImage;
+    private File encryptedHashMessage;
     private File fileInitVector;
+    private File fileInitVectorForImage;
 
     private File filePublicA;
     private File filePublicB;
 
     private File filePrivateA;
     private File filePrivateB;
-    private File aesKey;
+    private File aesKeyForMessage;
+    private File aesKeyForImage;
+
+    private File imageForEncryption;
+    private File encryptedHashImageMessage;
 
     public FileCollector() {
         AllocateFileLocationsToFilesForDecryption();
@@ -41,21 +47,35 @@ public class FileCollector {
     private void AllocateFileLocationsToFilesForEncryption() {
         filePublicB = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/rsaDecPub.txt");
         filePrivateA = new File(directoryThatContainsAllTheNecessaryFilesForUser + "/rsaEncPriv.txt");
-        aesKey = new File(directoryThatContainsAllTheNecessaryFilesForUser + "/AesKey.txt");
+        aesKeyForMessage = new File(directoryThatContainsAllTheNecessaryFilesForUser + "/AesKeyForMessage.txt");
+        aesKeyForImage = new File(directoryThatContainsAllTheNecessaryFilesForUser + "/AesKeyForImage.txt");
     }
 
     private void AllocateFileLocationsToFilesForDecryption() {
         encryptedMessageFile = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/encFile.txt");
-        encryptedAesKeyFile = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/encAesKey.txt");
-        encryptedHash = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/encHash.txt");
+        encryptedAesKeyFileForMessage = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/encAesKeyForMessage.txt");
+        encryptedAesKeyFileForImage = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/encAesKeyForImage.txt");
+        encryptedHashMessage = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/encHashForMessage.txt");
+        encryptedHashImageMessage = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/encHashForMessageInImage.txt");
+        imageForEncryption = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/image.png");
         filePublicA = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/rsaEncPub.txt");
         filePrivateB = new File(directoryThatContainsAllTheNecessaryFilesForUser + "/rsaDecPriv.txt");
+        fileInitVectorForImage = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/ivForImage.txt");
         fileInitVector = new File(directoryThatContainsAllTheNecessaryFilesOnTheInternet + "/iv.txt");
     }
 
     public File ShowSaveDialog(Stage stage, String directory, String description, List<String> extensions) {
         FileChooser fileChooser = CreateDialog(directory, "Save your message", description, extensions);
         File file = fileChooser.showSaveDialog(stage);
+        if (file != null) {
+            return file;
+        }
+        return null;
+    }
+
+    public File ShowSelectDialog(Stage stage, String directory, String description, List<String> extensions) {
+        FileChooser fileChooser = CreateDialog(directory, "Select a file", description, extensions);
+        File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             return file;
         }
@@ -71,20 +91,11 @@ public class FileCollector {
         return fileChooser;
     }
 
-    public File ShowSelectDialog(Stage stage, String directory, String description, List<String> extensions) {
-        FileChooser fileChooser = CreateDialog(directory, "Select a file", description, extensions);
-        File file = fileChooser.showOpenDialog(stage);
-        if (file != null) {
-            return file;
-        }
-        return null;
-    }
-
     static String getDirectoryThatContainsAllTheNecessaryFilesForUser() {
         return directoryThatContainsAllTheNecessaryFilesForUser;
     }
 
-    static String getDirectoryThatContainsAllTheNecessaryFilesOnTheInternet() {
+    public static String getDirectoryThatContainsAllTheNecessaryFilesOnTheInternet() {
         return directoryThatContainsAllTheNecessaryFilesOnTheInternet;
     }
 
@@ -104,6 +115,10 @@ public class FileCollector {
         return fileDecHash;
     }
 
+    public File getFileImage() {
+        return imageForEncryption;
+    }
+
     public void setFileDecMessage(File fileDecMessage) {
         this.fileDecMessage = fileDecMessage;
     }
@@ -116,12 +131,16 @@ public class FileCollector {
         return encryptedMessageFile;
     }
 
-    public File getEncryptedAesKeyFile() {
-        return encryptedAesKeyFile;
+    public File getEncryptedAesKeyFileForMessage() {
+        return encryptedAesKeyFileForMessage;
     }
 
-    public File getEncryptedHash() {
-        return encryptedHash;
+    public File getEncryptedHashForMessage() {
+        return encryptedHashMessage;
+    }
+
+    public File getEncryptedHashForImageMessage() {
+        return encryptedHashImageMessage;
     }
 
     public File getFilePublicA() {
@@ -140,12 +159,24 @@ public class FileCollector {
         return filePrivateA;
     }
 
-    public File getFileInitVector() {
+    public File getFileInitVectorForMessage() {
         return fileInitVector;
     }
 
-    public File getAesKey() {
-        return aesKey;
+    public File getFileInitVectorForImage() {
+        return fileInitVectorForImage;
+    }
+
+    public File getAesKeyForMessage() {
+        return aesKeyForMessage;
+    }
+
+    public File getEncryptedAesKeyFileForImage() {
+        return encryptedAesKeyFileForImage;
+    }
+
+    public File getAesKeyForImage() {
+        return aesKeyForImage;
     }
 
     public String getCrossRemoveSign() {

@@ -78,7 +78,7 @@ public class AESEncryption {
         runAlgorithmFile(inputFile, outputFile, c);
     }
 
-    public static String  encryptStringAES(String message, Key key, IvParameterSpec initVector)
+    public static String encryptStringAES(String message, Key key, IvParameterSpec initVector)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         if (!key.getAlgorithm().equals(UsableAlgorithm.AES.getAlgorithm())) {
