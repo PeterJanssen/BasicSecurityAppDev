@@ -7,10 +7,11 @@ import java.nio.file.Path;
 // Many thanks and credits to Yoga-Priya @ GitHub: https://github.com/Yoga-Priya/Image-Steganography-using-LSB
 
 public class LSB_decode {
-    private static String b_msg = "";
-    private static int len = 0;
 
     public static String DecodeTheMessage(Path imagePath) throws Exception {
+        String b_msg = "";
+        int len = 0;
+
         BufferedImage image = ImageIO.read(imagePath.toFile());
         int j = 0;
         int currentBitEntry = 0;

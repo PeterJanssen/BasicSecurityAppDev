@@ -13,7 +13,7 @@ public class LSB_encode {
 
     public static int[] getMessageBits(String msg) {
         int j = 0;
-        int[] b_msg = new int[msg.length() * 8];
+        int[] messageBits = new int[msg.length() * 8];
         for (int i = 0; i < msg.length(); i++) {
             int x = msg.charAt(i);
             String binaryString = Integer.toBinaryString(x);
@@ -22,12 +22,12 @@ public class LSB_encode {
             }
 
             for (int i1 = 0; i1 < 8; i1++) {
-                b_msg[j] = Integer.parseInt(String.valueOf(binaryString.charAt(i1)));
+                messageBits[j] = Integer.parseInt(String.valueOf(binaryString.charAt(i1)));
                 j++;
             }
         }
 
-        return b_msg;
+        return messageBits;
     }
 
     public static BufferedImage readImageFile(String COVERIMAGEFILE) {
